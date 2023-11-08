@@ -770,7 +770,7 @@ class RandomForestClassifier(RandomForestClassifier_original, RandomForestBase):
         if n_classes < 2:
             raise ValueError("Training data only contain information about one class.")
 
-        daal_engine = daal4py.engines_mt19937(seed=seed_, fptype=getFPType(X))
+        daal_engine = daal4py.engines_mt2203(seed=seed_, fptype=getFPType(X))
 
         features_per_node = _to_absolute_max_features(
             self.max_features, X.shape[1], is_classification=True
@@ -1312,7 +1312,7 @@ class RandomForestRegressor(RandomForestRegressor_original, RandomForestBase):
 
         seed_ = rs_.randint(0, np.iinfo("i").max)
 
-        daal_engine = daal4py.engines_mt19937(seed=seed_, fptype=getFPType(X))
+        daal_engine = daal4py.engines_mt2203(seed=seed_, fptype=getFPType(X))
 
         features_per_node = _to_absolute_max_features(
             self.max_features, X.shape[1], is_classification=False
