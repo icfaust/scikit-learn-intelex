@@ -42,6 +42,7 @@ def get_patch_map():
         # Scikit-learn* modules
         import sklearn as base_module
         import sklearn.cluster as cluster_module
+        import sklearn.covariance as covariance_module
         import sklearn.decomposition as decomposition_module
         import sklearn.ensemble as ensemble_module
         import sklearn.linear_model as linear_model_module
@@ -76,7 +77,13 @@ def get_patch_map():
 
         # Preview classes for patching
         from .preview.cluster import KMeans as KMeans_sklearnex
+        from .preview.covariance import (
+            EmpiricalCovariance as EmpiricalCovariance_sklearnex,
+        )
         from .preview.decomposition import PCA as PCA_sklearnex
+        from .preview.linear_model import (
+            LogisticRegression as LogisticRegression_sklearnex,
+        )
         from .svm import SVC as SVC_sklearnex
         from .svm import SVR as SVR_sklearnex
         from .svm import NuSVC as NuSVC_sklearnex
@@ -100,6 +107,33 @@ def get_patch_map():
                     None,
                 ]
             ]
+
+            # Covariance
+            mapping["empiricalcovariance"] = [
+                [
+                    (
+                        covariance_module,
+                        "EmpiricalCovariance",
+                        EmpiricalCovariance_sklearnex,
+                    ),
+                    None,
+                ]
+            ]
+
+            # LogisticRegression
+            mapping.pop("logisticregression")
+            mapping.pop("log_reg")
+            mapping["log_reg"] = [
+                [
+                    (
+                        linear_model_module,
+                        "LogisticRegression",
+                        LogisticRegression_sklearnex,
+                    ),
+                    None,
+                ]
+            ]
+            mapping["logisticregression"] = mapping["log_reg"]
 
         # DBSCAN
         mapping.pop("dbscan")
