@@ -68,16 +68,6 @@ def _get_map_of_algorithms():
         "elasticnet": [[(linear_model_module, "ElasticNet", ElasticNet_daal4py), None]],
         "lasso": [[(linear_model_module, "Lasso", Lasso_daal4py), None]],
         "svm": [[(svm_module, "SVC", SVC_daal4py), None]],
-        "logistic": [
-            [
-                (
-                    logistic_module,
-                    "_logistic_regression_path",
-                    daal_optimized_logistic_path,
-                ),
-                None,
-            ]
-        ],
         "log_reg": [
             [
                 (linear_model_module, "LogisticRegression", LogisticRegression_daal4py),
@@ -128,7 +118,6 @@ def _get_map_of_algorithms():
     mapping["randomforestregressor"] = mapping["random_forest_regressor"]
     mapping["linearregression"] = mapping["linear"]
     mapping["logisticregression"] = mapping["log_reg"]
-    mapping["_logistic_regression_path"] = mapping["logistic"]
     mapping["_assert_all_finite"] = mapping["fin_check"]
     mapping["pairwise_distances"] = mapping["distances"]
     return mapping
