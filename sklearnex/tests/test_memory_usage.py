@@ -23,6 +23,16 @@ import types
 import numpy as np
 import pandas as pd
 import pytest
+from _utils import (
+    DTYPES,
+    PATCHED_FUNCTIONS,
+    PATCHED_MODELS,
+    SPECIAL_INSTANCES,
+    UNPATCHED_FUNCTIONS,
+    UNPATCHED_MODELS,
+    gen_dataset,
+    gen_models_info,
+)
 from scipy.stats import pearsonr
 from sklearn.base import BaseEstimator
 from sklearn.datasets import make_classification
@@ -75,20 +85,6 @@ class RocAucEstimator:
         print(roc_auc_score(y, np.zeros(shape=y.shape, dtype=np.int32)))
 
 
-# add all daal4py estimators enabled in patching (except banned)
-
-
-def get_patched_estimators(ban_list, output_list):
-    patched_estimators = get_patch_map().values()
-    for listing in patched_estimators:
-        estimator, name = listing[0][0][2], listing[0][0][1]
-        if not isinstance(estimator, types.FunctionType):
-            if name not in ban_list:
-                if issubclass(estimator, BaseEstimator):
-                    if hasattr(estimator, "fit"):
-                        output_list.append(estimator)
-
-
 def remove_duplicated_estimators(estimators_list):
     estimators_map = {}
     for estimator in estimators_list:
@@ -96,7 +92,7 @@ def remove_duplicated_estimators(estimators_list):
         estimators_map[full_name] = estimator
     return estimators_map.values()
 
-
+ESTIMATORS = PATCHED_MODELS.copy()
 BANNED_ESTIMATORS = ("TSNE",)  # too slow for using in testing on common data size
 estimators = [
     PreviewPCA,
