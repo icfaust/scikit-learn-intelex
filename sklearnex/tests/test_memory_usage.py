@@ -83,17 +83,13 @@ class RocAucEstimator:
 
     def fit(self, x, y):
         print(roc_auc_score(y, np.zeros(shape=y.shape, dtype=np.int32)))
-
-
-def remove_duplicated_estimators(estimators_list):
-    estimators_map = {}
-    for estimator in estimators_list:
-        full_name = f"{estimator.__module__}.{estimator.__name__}"
-        estimators_map[full_name] = estimator
-    return estimators_map.values()
+        
 
 ESTIMATORS = PATCHED_MODELS.copy()
 BANNED_ESTIMATORS = ("TSNE",)  # too slow for using in testing on common data size
+for est in BANNED_ESTIMATORS:
+    del ESTIMATORS[est]
+
 estimators = [
     PreviewPCA,
     TrainTestSplitEstimator,
@@ -102,8 +98,6 @@ estimators = [
     CorrelationDistancesEstimator,
     RocAucEstimator,
 ]
-get_patched_estimators(BANNED_ESTIMATORS, estimators)
-estimators = remove_duplicated_estimators(estimators)
 
 
 def ndarray_c(x, y):
@@ -219,7 +213,7 @@ def _kfold_function_template(estimator, data_transform_function, data_shape):
 
 @pytest.mark.allow_sklearn_fallback
 @pytest.mark.parametrize("data_transform_function", data_transforms)
-@pytest.mark.parametrize("estimator", estimators)
+@pytest.mark.parametrize("estimator", ESTIMATORS)
 @pytest.mark.parametrize("data_shape", data_shapes)
-def test_memory_leaks(estimator, data_transform_function, data_shape):
+def test_estimator_memory_leaks(estimator, data_transform_function, data_shape):
     _kfold_function_template(estimator, data_transform_function, data_shape)
