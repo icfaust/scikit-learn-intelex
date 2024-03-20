@@ -79,3 +79,5 @@ def log_device_transfers(monkeypatch):
 # if dpctl is available
 # wrap copy_to_host and copy_from_host so that it will
 # write to sklearnex's logger at info level when used
+
+# What to do with asarray? may require a device check
