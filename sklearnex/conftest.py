@@ -61,3 +61,21 @@ def with_sklearnex():
     patch_sklearn()
     yield
     unpatch_sklearn()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def log_device_transfers(monkeypatch):
+# add logging for observing array_apis' to_device
+# by monkeypatching sklearn's get_namespace
+# and for dpctl's copy_to_host and copy_from_host
+
+# add wrapper to get_namespace
+# which checks if output is in a master list
+# if it is not, check if it has a 'to_device' method
+# if so, wrap to_device to write to sklearnex's logger
+# at info level when used then add to the master list
+# (or just make the function an lru_cache)
+
+# if dpctl is available
+# wrap copy_to_host and copy_from_host so that it will
+# write to sklearnex's logger at info level when used
