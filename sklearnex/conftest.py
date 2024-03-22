@@ -17,9 +17,15 @@
 import io
 import logging
 
+from functools import lru_cache, wraps
+
 import pytest
 
+from daal4py.sklearn._utils import sklearn_check_version
 from sklearnex import patch_sklearn, unpatch_sklearn
+
+if sklearn_check_version("1.2"):
+    from sklearn.utils._array_api import get_namespace
 
 
 def pytest_configure(config):
@@ -62,6 +68,31 @@ def with_sklearnex():
     yield
     unpatch_sklearn()
 
+if sklearn_check_version("1.2):
+    def new_get_namespace(monkeypatch, *arrays):
+        
+        @lru_cache(maxsize=None)
+        def wrap_to_device(namespace):
+            # array_api spec doesn't have a standard way
+            # of accessing the array object primitive but
+            # does have standards for creation. Use the
+            # "asarray" method in the namespace with type 
+            # to yield the array class.
+            array_class = type(namespace.asarray(0))
+            setattr(array_class, "to_device", array_api_log_transfer(array_class.to_device))
+            
+        xp, is_array_api_compliant = get_namespace(*arrays)
+        if is_array_api_compliant:
+            wrap_to_device(xp)
+        return xp, is_array_api_compliant
+
+
+def array_api_log_transfer(func):
+    @wraps
+    def to_device(self, target, *args, **kwargs):
+        logging.getLogger("sklearnex").info(f"data copy from {self.device} to {target}")
+        return self.to_device(target, *args, **kwargs)
+    return to_device        
 
 @pytest.fixture(scope="session", autouse=True)
 def log_device_transfers(monkeypatch):
@@ -75,6 +106,8 @@ def log_device_transfers(monkeypatch):
 # if so, wrap to_device to write to sklearnex's logger
 # at info level when used then add to the master list
 # (or just make the function an lru_cache)
+if sklearn_check_version("1.2"):
+    
 
 # if dpctl is available
 # wrap copy_to_host and copy_from_host so that it will
