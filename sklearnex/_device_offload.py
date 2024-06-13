@@ -192,14 +192,17 @@ def dispatch(obj, method_name, branches, *args, **kwargs):
 
     backend, q, patching_status = _get_backend(obj, q, method_name, *hostargs)
 
-    if backend == "onedal":
-        patching_status.write_log(queue=q)
-        return branches[backend](obj, *hostargs, **hostkwargs, queue=q)
-    if backend == "sklearn":
-        patching_status.write_log()
-        return branches[backend](obj, *hostargs, **hostkwargs)
-    raise RuntimeError(
-        f"Undefined backend {backend} in " f"{obj.__class__.__name__}.{method_name}"
+    try:
+        method = branches[backend]
+    except IndexError:
+        raise RuntimeError(
+            f"Undefined backend {backend} in " f"{obj.__class__.__name__}.{method_name}"
+        )
+    patching_status.write_log(queue=q)
+    return method(
+        obj,
+        *hostargs,
+        **(dict(hostkwargs, queue=q) if backend == "onedal" else hostkwargs),
     )
 
 
