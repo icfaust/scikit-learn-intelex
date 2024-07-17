@@ -91,10 +91,10 @@ jobs:
         with:
           name: __release_win
           path: .\__release_win_vc
-      - name: Zip DPC++
+      - name: Compress DPC++
         shell: cmd
         run: |
-          zip icx.zip .\dpcpp -r
+          tar -cvzf icx.zip .\dpcpp
       - name: Archive DPC++
         uses: actions/upload-artifact@v4
         with:
