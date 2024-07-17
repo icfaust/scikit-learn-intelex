@@ -91,3 +91,12 @@ jobs:
         with:
           name: __release_win
           path: .\__release_win_vc
+      - name: Zip DPC++
+        shell: cmd
+        run: |
+          zip icx.zip .\dpcpp -r
+      - name: Archive DPC++
+        uses: actions/upload-artifact@v4
+        with:
+          name: icx_compiler
+          path: .\icx.zip
