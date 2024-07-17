@@ -90,4 +90,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: __release_win
-          path: .\__release_win
+          path: .\__release_win_vc
