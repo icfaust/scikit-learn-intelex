@@ -9,7 +9,7 @@ env:
 jobs:
   sklearn:
     name: Python3.9_Sklearn1.1
-    runs-on: intel-ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -95,3 +95,55 @@ jobs:
           source ../__release_lnx/daal/latest/env/vars.sh # prepare oneDAL
           export SKLEARNEX_PREVIEW='1'
           bash ./scripts/run_sklearn_tests.sh cpu
+    name: Python3.9_Sklearn1.1
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}          
+      - name: Get run ID of "build_oneDAL" workflow
+        id: get-run-id
+        run: |
+          OTHER_REPO="${{ github.repository }}"
+          WF_NAME="oneDAL nightly build"
+          RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --jq .[0].databaseId`
+          echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
+          echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Download artifact from "build_oneDAL" workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: __release_win
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.get-run-id.outputs.run-id }}
+          path: .\__release_win
+      - name: Download compiler
+        uses: actions/download-artifact@v4
+        with:
+          name: icx_compiler
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.get-run-id.outputs.run-id }}
+          path: .\icx.zip
+      - name: Unzip compiler
+          shell: cmd
+          run: |
+            tar -xvzf icx.zip
+            dir .
+      - name: Install dependencies
+          shell: cmd
+          run: |
+            pip install --upgrade setuptools
+            pip install cpufeature clang-format pyyaml
+            pip install -r dependencies-dev
+      - name: System info 
+        shell: cmd
+        run: |
+          call .\dpcpp\compiler\latest\env\vars.bat
+          set PATH=C:\msys64\usr\bin;%PATH%
+          bash .ci/scripts/describe_system.sh
