@@ -162,7 +162,7 @@ jobs:
           set PREFIX=.
           set NO_DIST=1
           dir .
-          call conda-recipe\bld.bat
+          call .\conda-recipe\bld.bat
           dir .
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
           set CONDA_PREFIX=%DALROOT%
