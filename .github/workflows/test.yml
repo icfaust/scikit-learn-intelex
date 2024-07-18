@@ -107,6 +107,7 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}          
       - name: Get run ID of "build_oneDAL" workflow
         id: get-run-id
+        shell: cmd
         run: |
           OTHER_REPO="${{ github.repository }}"
           WF_NAME="oneDAL nightly build"
