@@ -114,6 +114,7 @@ jobs:
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          gh run --repo ${OTHER_REPO} watch ${RUN_ID} --interval 180 # wait for oneDAL build to complete if needed
         env:
           GH_TOKEN: ${{ github.token }}
       - name: Download artifact from "build_oneDAL" workflow
@@ -160,6 +161,7 @@ jobs:
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           set PREFIX=.
           set NO_DIST=1
+          dir .
           call conda-recipe\bld.bat
           dir .
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
