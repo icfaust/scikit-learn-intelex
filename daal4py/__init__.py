@@ -36,10 +36,7 @@ if "Windows" in platform.system():
             if os.path.exists(dal_root_redist):
                 os.add_dll_directory(dal_root_redist)
                 os.environ["PATH"] = dal_root_redist + os.pathsep + os.environ["PATH"]
-        try:
-            os.add_dll_directory(path_to_libs) # Conda default
-        except FileNotFoundError:
-            os.add_dll_directory(path_to_libs.rstrip("bin")+"Scripts") # venv default
+        os.add_dll_directory(path_to_libs)
         os.add_dll_directory(path_to_oneapi_backend)
     os.environ["PATH"] = path_to_libs + os.pathsep + os.environ["PATH"]
 
