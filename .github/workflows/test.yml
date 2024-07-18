@@ -150,3 +150,18 @@ jobs:
           call .\dpcpp\compiler\2024.2\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
+          dir .\__release_win\daal\latest\env
+      - name: System info 
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
+          call .\dpcpp\compiler\2024.2\env\vars.bat
+          call .\dpcpp\tbb\2024.2\env\vars.sh # prepare tbb
+          call .\__release_win\daal\latest\env\vars.sh # prepare oneDAL
+          set PREFIX=.
+          set NO_DIST=1
+          set PYTHON=python
+          call conda-recipe\bld.bat
+          IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
+          set CONDA_PREFIX=%DALROOT%
+          python setup_sklearnex.py install --single-version-externally-managed --record=record_sklearnex.txt
