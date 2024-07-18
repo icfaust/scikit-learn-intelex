@@ -39,8 +39,7 @@ if "Windows" in platform.system():
         try:
             os.add_dll_directory(path_to_libs)
         except FileNotFoundError:
-            os.add_dll_directory(os.path.join(path_to_env, "Lib", "bin"))
-
+            pass
         os.add_dll_directory(path_to_oneapi_backend)
     os.environ["PATH"] = path_to_libs + os.pathsep + os.environ["PATH"]
 
