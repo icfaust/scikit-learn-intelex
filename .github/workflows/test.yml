@@ -143,6 +143,9 @@ jobs:
         run: |
           python -m venv env2
           call .\env2\Scripts\activate.bat
+          dir .\env2
+          dir .\env2\Library
+          dir .\env2\Library\bin
           pip install --upgrade setuptools
           pip install cpufeature clang-format pyyaml
           pip install -r dependencies-dev
