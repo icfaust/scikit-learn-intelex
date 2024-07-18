@@ -137,7 +137,7 @@ jobs:
         run: |
           tar -xvzf icx.zip
           dir .
-          dir .\dpcpp\compiler\latest\env
+          dir .\dpcpp\compiler\2024.2\env
       - name: Install dependencies
         shell: cmd
         run: |
@@ -147,6 +147,6 @@ jobs:
       - name: System info 
         shell: cmd
         run: |
-          call .\dpcpp\compiler\latest\env\vars.bat
+          call .\dpcpp\compiler\2024.2\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
