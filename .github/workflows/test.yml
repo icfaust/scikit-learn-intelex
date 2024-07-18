@@ -141,6 +141,8 @@ jobs:
       - name: Install dependencies
         shell: cmd
         run: |
+          python -m venv env2
+          call .\env2\Scripts\activate.bat
           pip install --upgrade setuptools
           pip install cpufeature clang-format pyyaml
           pip install -r dependencies-dev
@@ -150,10 +152,10 @@ jobs:
           call .\dpcpp\compiler\2024.2\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
-          dir .\__release_win\daal\latest\env
       - name: Build daal4py/sklearnex
         shell: cmd
         run: |
+          call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
           call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
@@ -169,6 +171,7 @@ jobs:
         shell: cmd
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
+          call .\env2\Scripts\activate.bat
           bash .ci/scripts/setup_sklearn.sh ${{ env.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
@@ -177,6 +180,7 @@ jobs:
       - name: Sklearnex testing
         shell: cmd
         run: |
+          call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
           call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
