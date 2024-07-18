@@ -145,7 +145,7 @@ jobs:
           call .\env2\Scripts\activate.bat
           dir .\env2
           dir .\env2\Lib
-          dir .\env2\Lib\bin
+          dir .\env2\Library
           pip install --upgrade setuptools
           pip install cpufeature clang-format pyyaml
           pip install -r dependencies-dev
@@ -175,6 +175,13 @@ jobs:
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
           call .\env2\Scripts\activate.bat
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
+          call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
+          call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
+          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          dir .\env2
+          dir .\env2\Lib
+          dir .\env2\Library
           bash .ci/scripts/setup_sklearn.sh ${{ env.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
