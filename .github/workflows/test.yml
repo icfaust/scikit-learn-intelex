@@ -139,23 +139,18 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf icx.zip
-          dir .
-          dir .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env
       - name: Install dependencies
         shell: cmd
         run: |
           python -m venv env2
           call .\env2\Scripts\activate.bat
-          dir .\env2
-          dir .\env2\Lib
-          dir .\env2\Library
           pip install --upgrade setuptools
           pip install cpufeature clang-format pyyaml
           pip install -r dependencies-dev
       - name: System info 
         shell: cmd
         run: |
-          call .\dpcpp\compiler\2024.2\env\vars.bat
+          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
@@ -163,12 +158,11 @@ jobs:
         run: |
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
+          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
+          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           set PREFIX=.
-          set NO_DIST=1
-          set PYTHON=python
+          echo "NO_DIST=1" >> "$GITHUB_ENV"
           call conda-recipe\bld.bat
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
           set CONDA_PREFIX=%DALROOT%
@@ -179,12 +173,9 @@ jobs:
           set PATH=C:\msys64\usr\bin;%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
+          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
+          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
-          dir .\env2
-          dir .\env2\Lib
-          dir .\env2\Library
           bash .ci/scripts/setup_sklearn.sh ${{ env.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
@@ -195,8 +186,8 @@ jobs:
         run: |
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\2024.2\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\2021.13\env\vars.bat # prepare tbb
+          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
+          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           set PYTHON=python
           cd ..
