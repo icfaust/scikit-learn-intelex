@@ -159,6 +159,7 @@ jobs:
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           set PREFIX=.
           set NO_DIST=1
+          set PYTHON=python
           dir .
           call .\conda-recipe\bld.bat
           dir .
