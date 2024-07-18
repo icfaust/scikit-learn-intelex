@@ -131,7 +131,7 @@ jobs:
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
-          path: .\icx.zip
+          path: .
       - name: Unzip compiler
         shell: cmd
         run: |
