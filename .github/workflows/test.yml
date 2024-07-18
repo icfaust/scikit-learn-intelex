@@ -152,7 +152,6 @@ jobs:
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
-          echo "NO_DIST=1" >> "$GITHUB_ENV"
       - name: Build daal4py/sklearnex
         shell: cmd
         run: |
@@ -162,6 +161,7 @@ jobs:
           call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           set PREFIX=.
+          set NO_DIST=1
           call conda-recipe\bld.bat
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
           set CONDA_PREFIX=%DALROOT%
