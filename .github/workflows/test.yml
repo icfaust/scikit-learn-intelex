@@ -137,6 +137,7 @@ jobs:
         run: |
           tar -xvzf icx.zip
           dir .
+          dir icx.zip
       - name: Install dependencies
         shell: cmd
         run: |
