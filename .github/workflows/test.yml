@@ -131,16 +131,16 @@ jobs:
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .\icx.zip
       - name: Unzip compiler
-          shell: cmd
-          run: |
-            tar -xvzf icx.zip
-            dir .
+        shell: cmd
+        run: |
+          tar -xvzf icx.zip
+          dir .
       - name: Install dependencies
-          shell: cmd
-          run: |
-            pip install --upgrade setuptools
-            pip install cpufeature clang-format pyyaml
-            pip install -r dependencies-dev
+        shell: cmd
+        run: |
+          pip install --upgrade setuptools
+          pip install cpufeature clang-format pyyaml
+          pip install -r dependencies-dev
       - name: System info 
         shell: cmd
         run: |
