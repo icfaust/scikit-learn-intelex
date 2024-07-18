@@ -151,7 +151,7 @@ jobs:
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
           dir .\__release_win\daal\latest\env
-      - name: System info 
+      - name: Build daal4py/sklearnex
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
@@ -165,3 +165,13 @@ jobs:
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
           set CONDA_PREFIX=%DALROOT%
           python setup_sklearnex.py install --single-version-externally-managed --record=record_sklearnex.txt
+      - name: Install testing requirements
+        shell: cmd
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
+          call .\dpcpp\compiler\2024.2\env\vars.bat
+          call .\dpcpp\tbb\2024.2\env\vars.bat # prepare tbb
+          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          set PYTHON=python
+          cd ..
+          call scikit-learn-intelex\conda-recipe\run_test.bat scikit-learn-intelex
