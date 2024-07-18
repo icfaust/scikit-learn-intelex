@@ -7,7 +7,7 @@ env:
   SKLEARN_VERSION: 1.1
 
 jobs:
-  sklearn:
+  sklearn_lnx:
     name: lnx_Python3.9_Sklearn1.1
     runs-on: ubuntu-latest
     steps:
@@ -95,6 +95,7 @@ jobs:
           source ../__release_lnx/daal/latest/env/vars.sh # prepare oneDAL
           export SKLEARNEX_PREVIEW='1'
           bash ./scripts/run_sklearn_tests.sh cpu
+  sklearn_win:
     name: win_Python3.9_Sklearn1.1
     runs-on: windows-2022
     steps:
