@@ -35,10 +35,10 @@ try:
     from dpctl.tensor import usm_ndarray
 
     dpctl_available = True
-except ImportError as err:
-    warning = convert_error_to_warning(err)
-    warnings.warn(warning)
-    dpctl_available = False
+#except ImportError as err:
+#    warning = convert_error_to_warning(err)
+#    warnings.warn(warning)
+#    dpctl_available = False
 
 try:
     import dpnp
