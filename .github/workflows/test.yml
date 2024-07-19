@@ -182,6 +182,7 @@ jobs:
           pip install %SCIPY_VERSION%
           set DPCTL_SUPPORTED=3.9 3.11
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
+          python -c "import dpctl; dpctl.dump()"
           pip list
       - name: Sklearnex testing
         shell: cmd
