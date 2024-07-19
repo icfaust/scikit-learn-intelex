@@ -137,8 +137,8 @@ jobs:
       - name: Unzip compiler
         shell: cmd
         run: |
-          set DPCTL_SUPPORTED= 3.9 3.11
-          FOR %i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }} ==%i dir .
+          set DPCTL_SUPPORTED=3.9 3.11
+          FOR %i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%i dir .
           tar -xvzf icx.zip
       - name: Install dependencies
         shell: cmd
