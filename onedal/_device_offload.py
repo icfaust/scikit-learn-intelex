@@ -22,13 +22,22 @@ import numpy as np
 
 from ._config import _get_config
 
+import warnings
+
+def convert_error_to_warning(exception):
+    warning = RuntimeWarning(*exception.args)
+    warning.with_traceback(exception.__traceback__)
+    return warning
+
 try:
     from dpctl import SyclQueue
     from dpctl.memory import MemoryUSMDevice, as_usm_memory
     from dpctl.tensor import usm_ndarray
 
     dpctl_available = True
-except ImportError:
+except ImportError as err:
+    warning = convert_error_to_warning(err)
+    warnings.warn(warning)
     dpctl_available = False
 
 try:
