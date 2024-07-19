@@ -150,8 +150,6 @@ jobs:
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
-          dir .
       - name: Build daal4py/sklearnex
         shell: cmd
         run: |
@@ -182,7 +180,7 @@ jobs:
           pip install %SCIPY_VERSION%
           set DPCTL_SUPPORTED=3.9 3.11
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
-          python -c "import dpctl; dpctl.dump()"
+          python -c "import os, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, "Library", "bin"); os.add_dll_directory(path_to_libs); import dpctl; dpctl.get_devices()"
           pip list
       - name: Sklearnex testing
         shell: cmd
