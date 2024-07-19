@@ -163,9 +163,7 @@ jobs:
           set PREFIX=.
           set NO_DIST=1
           set PYTHON=python
-          dir .
           call .\conda-recipe\bld.bat
-          dir .
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
           set CONDA_PREFIX=%DALROOT%
           python setup_sklearnex.py install --single-version-externally-managed --record=record_sklearnex.txt
