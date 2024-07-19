@@ -44,11 +44,10 @@ try:
     import onedal._onedal_py_dpc as _backend
 
     _is_dpc_backend = True
-except ValueError:
-    pass
-#    import onedal._onedal_py_host as _backend
+except ImportError:
+    import onedal._onedal_py_host as _backend
 
-#    _is_dpc_backend = False
+    _is_dpc_backend = False
 
 _is_spmd_backend = False
 
