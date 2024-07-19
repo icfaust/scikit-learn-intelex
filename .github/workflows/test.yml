@@ -7,6 +7,8 @@ env:
   SKLEARN_VERSION: 1.1
   TBB_VERSION: 2021.13
   DPCPP_VERSION: 2024.2
+  DPTCL_VERSION: 17.0
+  DPNP_VERSION: 16.0
 
 jobs:
   sklearn_lnx:
@@ -70,7 +72,7 @@ jobs:
           bash .ci/scripts/setup_sklearn.sh ${{ env.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           pip install $(python .ci/scripts/get_compatible_scipy_version.py) pyyaml
-          # if [ $(echo ${{ env.PYTHON_VERSION }} | grep '3.9\|3.10') ]; then pip install dpctl==0.16.0 dpnp==0.14.0; fi
+          if [ $(echo ${{ env.PYTHON_VERSION }} | grep '3.9\|3.11') ]; then pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}; fi
           pip list
       - name: Sklearnex testing
         working-directory: ./.ci
@@ -149,6 +151,7 @@ jobs:
         run: |
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
+          if (echo ${{ env.PYTHON_VERSION }} | grep "3.9\|3.11") dir .
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
         shell: cmd
@@ -180,6 +183,7 @@ jobs:
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
           pip install %SCIPY_VERSION%
+          if (echo ${{ env.PYTHON_VERSION }} | grep "3.9\|3.11") pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           pip list
       - name: Sklearnex testing
         shell: cmd
