@@ -205,7 +205,7 @@ jobs:
           call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
           call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
           bash .ci/scripts/run_sklearn_tests.sh
-      - name: Sklearnex testing
+      - name: Sklearn testing [preview]
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
