@@ -39,8 +39,6 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: ./__release_lnx
-      - name: Show downloaded files
-        run: ls -la
       - name: apt-get
         run: sudo apt-get update && sudo apt-get install -y clang-format
       - name: dpcpp installation
@@ -152,6 +150,7 @@ jobs:
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
+          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
       - name: Build daal4py/sklearnex
         shell: cmd
         run: |
