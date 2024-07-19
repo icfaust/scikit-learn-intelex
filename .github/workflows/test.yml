@@ -151,6 +151,7 @@ jobs:
           set PATH=C:\msys64\usr\bin;%PATH%
           bash .ci/scripts/describe_system.sh
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
+          dir .
       - name: Build daal4py/sklearnex
         shell: cmd
         run: |
