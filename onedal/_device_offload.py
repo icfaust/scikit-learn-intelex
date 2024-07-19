@@ -35,7 +35,8 @@ try:
     from dpctl.tensor import usm_ndarray
 
     dpctl_available = True
-#except ImportError as err:
+except ValueError as err:
+    pass
 #    warning = convert_error_to_warning(err)
 #    warnings.warn(warning)
 #    dpctl_available = False
