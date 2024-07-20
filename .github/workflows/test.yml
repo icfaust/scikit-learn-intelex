@@ -97,7 +97,7 @@ jobs:
           bash .ci/scripts/run_sklearn_tests.sh cpu
   sklearn_win:
     name: win_Python3.9_Sklearn1.1
-    runs-on: windows-2022
+    runs-on: intel-windows-2022
     steps:
       - name: Checkout
         uses: actions/checkout@v4
