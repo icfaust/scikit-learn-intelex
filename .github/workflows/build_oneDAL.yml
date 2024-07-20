@@ -85,6 +85,7 @@ jobs:
         shell: cmd
         run: |
           call .\dpcpp\compiler\latest\env\vars.bat
+          call .\dpcpp\compiler\latest\bin\sycl-ls.exe
           call .\.ci\scripts\build.bat onedal_dpc vc avx2
       - name: Archive build
         uses: actions/upload-artifact@v4
