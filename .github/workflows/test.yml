@@ -184,6 +184,13 @@ jobs:
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           python -c "import os, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs); import dpctl; print(dpctl.get_devices())"
           pip list
+      - name: DPCTL test
+        shell: cmd
+        run: |
+          set PATH=C:\msys64\usr\bin;%PATH%
+          call .\env2\Scripts\activate.bat
+          python -c "import os, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs); import dpctl; print(dpctl.get_devices())"
+          pip list
       - name: Sklearnex testing
         shell: cmd
         run: |
