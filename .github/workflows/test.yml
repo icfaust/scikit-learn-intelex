@@ -242,7 +242,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      - name: Install dpctl
+      - name: Install dpctl pip venv
         shell: cmd
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
@@ -253,3 +253,14 @@ jobs:
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
           python -c "import dpctl; print(dpctl.get_devices())"
           pip list
+      - name: Install dpctl conda
+        shell: cmd
+        run: |
+          set PATH=C:\msys64\usr\bin;%PATH%
+          C:\Miniconda\condabin\conda.bat
+          conda create --name dpctl_env --channel https://software.repos.intel.com/python/conda/ dpctl
+          activate dpctl_env
+          set DPCTL_SUPPORTED=3.9 3.11
+          FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
+          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
+          python -c "import dpctl; print(dpctl.get_devices())"
