@@ -257,7 +257,7 @@ jobs:
         shell: cmd
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
-          C:\Miniconda\condabin\conda.bat activate base
+          C:\Miniconda\condabin\conda.bat init
           dir .
           conda create --name dpctl_env --channel https://software.repos.intel.com/python/conda/ dpctl
           dir .
