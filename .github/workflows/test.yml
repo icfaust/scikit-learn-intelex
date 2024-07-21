@@ -257,8 +257,10 @@ jobs:
         shell: cmd
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
-          C:\Miniconda\condabin\conda.bat
+          C:\Miniconda\condabin\conda.bat activate base
+          dir .
           conda create --name dpctl_env --channel https://software.repos.intel.com/python/conda/ dpctl
+          dir .
           activate dpctl_env
           set DPCTL_SUPPORTED=3.9 3.11
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
