@@ -259,7 +259,7 @@ jobs:
           dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
           dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
           gci env:* | sort-object name
-          echo $env:PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin";$env:PATH >> $env.GITHUB_ENV
+          $env:PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin";$env:PATH >> $env.GITHUB_ENV
       - name: Install dpctl pip venv
         shell: cmd
         run: |
