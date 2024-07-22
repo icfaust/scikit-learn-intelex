@@ -265,8 +265,7 @@ jobs:
           call .\env2\Scripts\activate.bat
           set DPCTL_SUPPORTED=3.9 3.11
           set CONDA_PREFIX=.\env2
-          FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
-          python -m pip install --index-url https://pypi.anaconda.org/intel/simple opencl_rt
+          FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i python -m pip install --index-url https://pypi.anaconda.org/intel/simple dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
