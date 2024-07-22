@@ -264,7 +264,7 @@ jobs:
         shell: cmd
         run: |
           echo %PATH%
-          set PATH=C:\msys64\usr\bin;%PATH%
+          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           python -m venv env2
           call .\env2\Scripts\activate.bat
           set DPCTL_SUPPORTED=3.9 3.11
