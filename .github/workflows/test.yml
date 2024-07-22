@@ -253,7 +253,7 @@ jobs:
           echo "Unpacking opencl runtime installer"
           Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
           echo "Installing opencl runtime"
-          Start-Process "msiexec.exe" -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" --Wait
+          Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
           dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
       - name: Install dpctl pip venv
