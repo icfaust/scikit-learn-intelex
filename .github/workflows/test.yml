@@ -132,6 +132,12 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
+      - name: Unzip Compiler
+        shell: cmd
+        run: |
+          tar -xvzf icx.zip
+          dir .
+          dir .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env
       - name: Prepare openCL runtime
         run: |
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
@@ -145,10 +151,6 @@ jobs:
           echo "Installing opencl runtime"
           Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
-      - name: Prepare openCL runtime
-        shell: cmd
-        run: |
-          tar -xvzf icx.zip
       - name: Install dependencies
         shell: cmd
         run: |
