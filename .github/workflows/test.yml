@@ -146,9 +146,9 @@ jobs:
           Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
       - name: Prepare openCL runtime
+        shell: cmd
         run: |
           tar -xvzf icx.zip
-          dir .
       - name: Install dependencies
         shell: cmd
         run: |
