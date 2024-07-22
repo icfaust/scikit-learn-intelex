@@ -250,13 +250,13 @@ jobs:
           echo "Download intel opencl runtime"
           wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
           echo "Unpacking opencl runtime installer"
-          Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
+          # Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
           echo "Installing opencl runtime"
-          Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
+          # Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
+          # dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
+          # dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
+          # dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
       - name: Install dpctl pip venv
         shell: cmd
         run: |
@@ -266,7 +266,7 @@ jobs:
           set DPCTL_SUPPORTED=3.9 3.11
           set CONDA_PREFIX=.\env2
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install opencl_rt dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
-          Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
+          # Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
           pip list
@@ -276,12 +276,11 @@ jobs:
           set PATH=C:\msys64\usr\bin;%PATH%
           call C:\Miniconda\condabin\conda.bat config --add channels https://software.repos.intel.com/python/conda/
           call C:\Miniconda\condabin\conda.bat config --append channels conda-forge
-          call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl==0.17.0
+          call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
           dir C:\Miniconda\envs\dpctl_env\
           dir C:\Miniconda\envs\dpctl_env\Library\
           dir C:\Miniconda\envs\dpctl_env\Library\bin\
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
           echo %CONDA_PREFIX%
-          Powershell.exe -executionpolicy bypass -File C:\Miniconda\envs\dpctl_env\Scripts\set-intel-ocl-icd-registry.ps1
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
