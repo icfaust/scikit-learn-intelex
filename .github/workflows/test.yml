@@ -248,6 +248,9 @@ jobs:
           echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
           pip install cpufeature
           pacman -S -y --noconfirm zip dos2unix tree wget gcc
+          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
+          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
+          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
           echo "Download intel opencl runtime"
           wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
           echo "Unpacking opencl runtime installer"
@@ -278,5 +281,6 @@ jobs:
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env --channel https://software.repos.intel.com/python/conda/ dpctl
           dir .
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
-          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
+          Powershell.exe -executionpolicy bypass -File C:\Miniconda\envs\dpctl_env\Scripts\set-intel-ocl-icd-registry.ps1
+          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
