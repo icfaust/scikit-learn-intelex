@@ -247,10 +247,6 @@ jobs:
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
           echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
           pip install cpufeature
-          pacman -S -y --noconfirm zip dos2unix tree wget gcc
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
           echo "Download intel opencl runtime"
           wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
           echo "Unpacking opencl runtime installer"
