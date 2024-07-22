@@ -266,6 +266,7 @@ jobs:
           Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
+          python -c "import site; print(site.USER_SITE)"
           pip list
       - name: Install dpctl conda
         shell: cmd
@@ -274,13 +275,10 @@ jobs:
           call C:\Miniconda\condabin\conda.bat config --add channels https://software.repos.intel.com/python/conda/
           call C:\Miniconda\condabin\conda.bat config --append channels conda-forge
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
-          dir C:\Miniconda\envs\dpctl_env\
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
-          echo "checking vars"
-          call C:\Miniconda\condabin\conda.bat env config vars list -n dpctl_env
-          call C:\Miniconda\condabin\conda.bat search intel-opencl-rt --info
           echo %CONDA_PREFIX%
           dir C:\Miniconda\envs\dpctl_env\Library\lib\
           more C:\Miniconda\envs\dpctl_env\Library\lib\cl.cfg
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
+          python -c "import site; print(site.USER_SITE)"
