@@ -267,6 +267,9 @@ jobs:
           set CONDA_PREFIX=.\env2
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i python -m pip install --index-url https://pypi.anaconda.org/intel/simple dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
+          dir env2\
+          dir env2\Library\
+          dir env2\Library\lib\
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
           pip list
@@ -283,5 +286,7 @@ jobs:
           call C:\Miniconda\condabin\conda.bat env config vars list -n dpctl_env
           call C:\Miniconda\condabin\conda.bat search intel-opencl-rt --info
           echo %CONDA_PREFIX%
+          dir C:\Miniconda\envs\dpctl_env\Library\lib\
+          more C:\Miniconda\envs\dpctl_env\Library\lib\cl.cfg
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
