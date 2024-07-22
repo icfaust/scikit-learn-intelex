@@ -137,10 +137,12 @@ jobs:
         run: |
           tar -xvzf icx.zip
           echo "Unzip complete"
+      - name: Set Environment Variables
+        shell: bash
+        run: |
+          echo "C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;" >> $GITHUB_PATH
       - name: Prepare openCL runtime
         run: |
-          $env:PATH="C:\msys64\usr\bin;$env:PATH"
-          echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
           pip install cpufeature
           echo "Download intel opencl runtime"
           wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
@@ -160,8 +162,6 @@ jobs:
       - name: System info 
         shell: cmd
         run: |
-          set PATH=C:\msys64\usr\bin;%PATH%
-          set PATH="C:\Program Files ^(x86^)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
           dir .
@@ -184,9 +184,6 @@ jobs:
       - name: Install testing requirements
         shell: cmd
         run: |
-          set PATH=C:\msys64\usr\bin;%PATH%
-          set PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
-          set PATH=C:\msys64\usr\bin;%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
@@ -204,8 +201,6 @@ jobs:
       - name: Sklearnex testing
         shell: cmd
         run: |
-          set PATH=C:\msys64\usr\bin;%PATH%
-          set PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
@@ -217,7 +212,6 @@ jobs:
       - name: Sklearn testing
         shell: cmd
         run: |
-          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
