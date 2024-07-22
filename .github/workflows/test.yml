@@ -281,5 +281,5 @@ jobs:
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
           echo %CONDA_PREFIX%
           Powershell.exe -executionpolicy bypass -File C:\Miniconda\envs\dpctl_env\Scripts\set-intel-ocl-icd-registry.ps1
-          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
+          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
