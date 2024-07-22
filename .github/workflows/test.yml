@@ -242,7 +242,6 @@ jobs:
       - name: Install intel opencl_rt
         run: |
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
-          "PATH={value}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
           pip install cpufeature
           echo "Download intel opencl runtime"
@@ -277,8 +276,6 @@ jobs:
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
           echo %CONDA_PREFIX%
-          dir C:\Miniconda\envs\dpctl_env\Library\lib\
-          more C:\Miniconda\envs\dpctl_env\Library\lib\cl.cfg
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
           python -c "import site; print(site.USER_SITE)"
