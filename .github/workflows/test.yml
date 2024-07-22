@@ -132,7 +132,7 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
-      - name: Prepare compiler and openCL runtime
+      - name: Prepare openCL runtime
         run: |
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
           "PATH={value}" | Out-File -FilePath $env:GITHUB_ENV -Append
@@ -145,6 +145,9 @@ jobs:
           echo "Installing opencl runtime"
           Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
+      - name: Prepare openCL runtime
+        shell: cmd
+        run: |
           tar -xvzf icx.zip
       - name: Install dependencies
         shell: cmd
