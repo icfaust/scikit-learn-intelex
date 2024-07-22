@@ -132,21 +132,20 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
-      - name: Unzip compiler
+      - name: Prepare compiler and openCL runtime
         run: |
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
+          "PATH={value}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
           pip install cpufeature
-          pacman -S -y --noconfirm zip dos2unix tree wget gcc
-          echo "Download intel DPC++ compiler"
-          wget -q -O dpcpp_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/7991e201-ca0f-4689-bdb6-1ed73a8246fd/w_dpcpp-cpp-compiler_p_2024.2.0.491_offline.exe
-          echo "Unpacking DPC++ installer"
-          Start-Process ".\dpcpp_installer.exe" -ArgumentList "--s --x --f oneAPI" -Wait
-          echo "Installing DPC++ compiler"
-          Start-Process ".\oneAPI\bootstrapper.exe" -ArgumentList "-s --eula=accept --install-dir=dpcpp" -Wait
-          # This can take 20 minutes...
-          echo "DPC++ install complete"
-          # tar -xvzf icx.zip
+          echo "Download intel opencl runtime"
+          wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
+          echo "Unpacking opencl runtime installer"
+          Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
+          echo "Installing opencl runtime"
+          Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
+          echo "opencl installed"
+          tar -xvzf icx.zip
       - name: Install dependencies
         shell: cmd
         run: |
@@ -158,6 +157,7 @@ jobs:
       - name: System info 
         shell: cmd
         run: |
+          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
           dir .
@@ -181,6 +181,7 @@ jobs:
       - name: Install testing requirements
         shell: cmd
         run: |
+          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           set PATH=C:\msys64\usr\bin;%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
@@ -191,20 +192,15 @@ jobs:
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
           pip install %SCIPY_VERSION%
+          # TEMPORARY FIX FOR ISSUES IN DPCTL PIP INSTALLATION
           set DPCTL_SUPPORTED=3.9 3.11
           FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
           pip list
-      - name: DPCTL test
-        shell: cmd
-        run: |
-          set PATH=C:\msys64\usr\bin;%PATH%
-          call .\env2\Scripts\activate.bat
-          python -c "import os, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs); import dpctl; print(dpctl.get_devices())"
-          pip list
       - name: Sklearnex testing
         shell: cmd
         run: |
+          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
@@ -216,6 +212,7 @@ jobs:
       - name: Sklearn testing
         shell: cmd
         run: |
+          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
           call .\env2\Scripts\activate.bat
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
@@ -245,8 +242,8 @@ jobs:
       - name: Install intel opencl_rt
         run: |
           $env:PATH="C:\msys64\usr\bin;$env:PATH"
+          "PATH={value}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
-          gci env:* | sort-object name
           pip install cpufeature
           echo "Download intel opencl runtime"
           wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
@@ -255,10 +252,6 @@ jobs:
           echo "Installing opencl runtime"
           Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
           echo "opencl installed"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin\"
-          dir "C:\Program Files (x86)\Common Files\Intel\Shared Libraries\lib\"
-          gci env:* | sort-object name
           $env:PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin";$env:PATH >> $env.GITHUB_ENV
       - name: Install dpctl pip venv
         shell: cmd
