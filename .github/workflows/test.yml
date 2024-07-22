@@ -275,8 +275,11 @@ jobs:
         run: |
           set PATH=C:\msys64\usr\bin;%PATH%
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env --channel https://software.repos.intel.com/python/conda/ dpctl
-          dir .
+          dir C:\Miniconda\envs\dpctl_env\
+          dir C:\Miniconda\envs\dpctl_env\Library\
+          dir C:\Miniconda\envs\dpctl_env\Library\bin\
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
+          echo %CONDA_PREFIX%
           Powershell.exe -executionpolicy bypass -File C:\Miniconda\envs\dpctl_env\Scripts\set-intel-ocl-icd-registry.ps1
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
