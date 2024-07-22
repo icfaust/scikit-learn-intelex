@@ -279,11 +279,10 @@ jobs:
           call C:\Miniconda\condabin\conda.bat config --append channels conda-forge
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
           dir C:\Miniconda\envs\dpctl_env\
-          dir C:\Miniconda\envs\dpctl_env\Library\
-          dir C:\Miniconda\envs\dpctl_env\Library\bin\
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
           echo "checking vars"
           call C:\Miniconda\condabin\conda.bat env config vars list -n dpctl_env
+          call C:\Miniconda\condabin\conda.bat search intel-opencl-rt --info
           echo %CONDA_PREFIX%
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
