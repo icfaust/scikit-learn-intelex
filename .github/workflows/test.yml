@@ -1,4 +1,4 @@
-name: oneDAL DPCPP nightly sklearnex
+name: CI
 on:
   workflow_dispatch:
 
