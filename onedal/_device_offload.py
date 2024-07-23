@@ -140,7 +140,7 @@ def _get_global_queue():
     target = _get_config()["target_offload"]
 
     QueueClass = DummySyclQueue if not dpctl_available else SyclQueue
-    assert target == "auto"
+    assert target == "auto", f"{target} is not auto"
     if target != "auto":
         if isinstance(target, QueueClass):
             return target
