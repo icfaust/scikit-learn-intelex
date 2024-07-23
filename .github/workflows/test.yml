@@ -132,25 +132,27 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
+      - name: Download Intel OpenCL CPU Runtime
+        uses: actions/download-artifact@v4
+        with:
+          name: opencl_rt_installer
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          run-id: ${{ steps.get-run-id.outputs.run-id }}
+          path: .
       - name: Unzip Compiler
         shell: cmd
         run: |
           tar -xvzf icx.zip
           echo "Unzip complete"
-      - name: Set Environment Variables
+      - name: Install Intel OpenCL CPU Runtime
+        run: |
+          echo "Installing OpenCL Runtime"
+          Start-Process msiexec -ArgumentList "/i opencl_rt.msi /qn" -Wait
+      - name: Set PATH Environment Variable
         shell: bash
         run: |
           echo "C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;" >> $GITHUB_PATH
-      - name: Prepare openCL runtime
-        run: |
-          pip install cpufeature
-          echo "Download intel opencl runtime"
-          wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
-          echo "Unpacking opencl runtime installer"
-          Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
-          echo "Installing opencl runtime"
-          Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
-          echo "opencl installed"
       - name: Install dependencies
         shell: cmd
         run: |
