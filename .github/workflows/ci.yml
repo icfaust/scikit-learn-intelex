@@ -58,7 +58,7 @@ jobs:
           DPCFLAG="0"
           if [ $(echo ${{ matrix.PYTHON_VERSION }} | grep '${{ env.DPCTL_PY_VERSIONS }}') ]; then DPCFLAG=''; fi
           # Turn off dpcpp building if it is not tested
-          if [ ${DPCFLAG}=='' ]; then echo "DPCPPROOT=/opt/intel/oneapi/compiler/latest" >> "$GITHUB_ENV"; fi
+          if [ ${DPCFLAG}=="" ]; then echo "DPCPPROOT=/opt/intel/oneapi/compiler/latest" >> "$GITHUB_ENV"; fi
           echo "DPCFLAG=${DPCFLAG}" >> "$GITHUB_OUTPUT"
       - name: apt-get
         run: sudo apt-get update && sudo apt-get install -y clang-format
@@ -85,7 +85,7 @@ jobs:
           bash .ci/scripts/setup_sklearn.sh ${{ matrix.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           pip install $(python .ci/scripts/get_compatible_scipy_version.py) pyyaml
-          if [ '${{ steps.set-env.outputs.DPCFLAG }}'=='' ]; then pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}; fi
+          if [ "${{ steps.set-env.outputs.DPCFLAG }}"=="" ]; then pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}; fi
           pip list
       - name: Sklearnex testing
         run: |
