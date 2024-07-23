@@ -19,7 +19,7 @@ jobs:
             SKLEARN_VERSION: "1.1"
           - PYTHON_VERSION: "3.11"
             SKLEARN_VERSION: "1.2"
-    name: lnx_Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
+    name: Linux Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }} nightly/pip
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -102,7 +102,7 @@ jobs:
             SKLEARN_VERSION: "1.1"
           - PYTHON_VERSION: "3.11"
             SKLEARN_VERSION: "1.2"
-    name: win_Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
+    name: Windows Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }} nightly/pip
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -220,53 +220,3 @@ jobs:
           call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           set SKLEARNEX_PREVIEW=YES
           bash .ci/scripts/run_sklearn_tests.sh
-  dpctl:
-    name: dpctl_test
-    runs-on: windows-2022
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Install Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.9
-      - name: Install intel opencl_rt
-        run: |
-          $env:PATH="C:\msys64\usr\bin;$env:PATH"
-          echo $env:PATH=C:\msys64\usr\bin;$env:PATH >> $env.GITHUB_ENV
-          pip install cpufeature
-          echo "Download intel opencl runtime"
-          wget -q -O opencl_installer.exe https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe
-          echo "Unpacking opencl runtime installer"
-          Start-Process ".\opencl_installer.exe" -ArgumentList "--s --x --f ocl" -Wait
-          echo "Installing opencl runtime"
-          Start-Process msiexec -ArgumentList "/i ocl\w_opencl_runtime_p_2024.2.0.980.msi /qn" -Wait
-          echo "opencl installed"
-          $env:PATH="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin";$env:PATH >> $env.GITHUB_ENV
-      - name: Install dpctl pip venv
-        shell: cmd
-        run: |
-          echo %PATH%
-          set PATH="C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;"%PATH%
-          python -m venv env2
-          call .\env2\Scripts\activate.bat
-          set DPCTL_SUPPORTED=3.9 3.11
-          set CONDA_PREFIX=.\env2
-          FOR %%i IN (%DPCTL_SUPPORTED%) DO if 3.9==%%i python -m pip install --index-url https://pypi.anaconda.org/intel/simple dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
-          Powershell.exe -executionpolicy bypass -File .\env2\Scripts\set-intel-ocl-icd-registry.ps1
-          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.lsplatform(2))"
-          python -c "import dpctl; print(dpctl.lsplatform(2))"
-          python -c "import site; print(site.USER_SITE)"
-          pip list
-      - name: Install dpctl conda
-        shell: cmd
-        run: |
-          set PATH=C:\msys64\usr\bin;%PATH%
-          call C:\Miniconda\condabin\conda.bat config --add channels https://software.repos.intel.com/python/conda/
-          call C:\Miniconda\condabin\conda.bat config --append channels conda-forge
-          call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
-          call C:\Miniconda\condabin\conda.bat activate dpctl_env
-          echo %CONDA_PREFIX%
-          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; print(path_to_env); path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); os.add_dll_directory(path_to_libs);os.add_dll_directory(os.path.join(path_to_env, 'Lib', 'site-packages', 'dpctl')); import dpctl; print(dpctl.lsplatform(2))"
-          python -c "import dpctl; print(dpctl.lsplatform(2))"
-          python -c "import site; print(site.USER_SITE)"
