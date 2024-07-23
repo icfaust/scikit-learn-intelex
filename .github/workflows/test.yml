@@ -19,7 +19,7 @@ jobs:
             SKLEARN_VERSION: "1.1"
           - PYTHON_VERSION: "3.11"
             SKLEARN_VERSION: "1.2"
-    name: Linux Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }} nightly/pip
+    name: (Linux-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -102,7 +102,7 @@ jobs:
             SKLEARN_VERSION: "1.1"
           - PYTHON_VERSION: "3.11"
             SKLEARN_VERSION: "1.2"
-    name: Windows Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }} nightly/pip
+    name: (Windows-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }})
     runs-on: windows-2022
     steps:
       - name: Checkout
