@@ -16,7 +16,7 @@ jobs:
         include:
           - PYTHON_VERSION: "3.9"
             SKLEARN_VERSION: "1.1"
-    name: Linux-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
+    name: (Linux-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }})
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -96,7 +96,7 @@ jobs:
         include:
           - PYTHON_VERSION: "3.9"
             SKLEARN_VERSION: "1.1"
-    name: Windows-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
+    name: (Windows-nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }})
     runs-on: windows-2022
     steps:
       - name: Checkout
@@ -168,7 +168,6 @@ jobs:
         run: |
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat
           call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\bin\sycl-ls.exe
-          dir .
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
         shell: cmd
