@@ -7,7 +7,6 @@ env:
   DPCPP_VERSION: 2024.2
   DPCTL_VERSION: 0.17.0
   DPNP_VERSION: 0.15.0
-  DPCTL_PY_VERSIONS: ("3.9" "3.11")
 
 jobs:
   sklearn_lnx:
@@ -155,7 +154,6 @@ jobs:
         run: |
           echo "C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;" >> $GITHUB_PATH
           # Disable SPMD testing
-          for i in "${${{ env.DPCTL_PY_VERSIONS }}}[@]" do echo "$i" done
           echo "NO_DIST=1" >> "$GITHUB_ENV"
       - name: Install dependencies
         shell: cmd
