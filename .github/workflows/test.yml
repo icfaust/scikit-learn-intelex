@@ -93,7 +93,7 @@ jobs:
           source /opt/intel/oneapi/compiler/latest/env/vars.sh # prepare icpx
           source /opt/intel/oneapi/tbb/latest/env/vars.sh # prepare tbb
           source __release_lnx/daal/latest/env/vars.sh # prepare oneDAL
-          export SKLEARNEX_PREVIEW='1'
+          export SKLEARNEX_PREVIEW='YES'
           bash .ci/scripts/run_sklearn_tests.sh cpu
   sklearn_win:
     name: win_Python3.9_Sklearn1.1
@@ -149,10 +149,12 @@ jobs:
         run: |
           echo "Installing OpenCL Runtime"
           Start-Process msiexec -ArgumentList "/i .\opencl_rt.msi /qn" -Wait
-      - name: Set PATH Environment Variable
+      - name: Set Environment Variables
         shell: bash
         run: |
           echo "C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;" >> $GITHUB_PATH
+          # Disable SPMD testing
+          echo "NO_DIST=1" >> "$GITHUB_ENV"
       - name: Install dependencies
         shell: cmd
         run: |
@@ -172,12 +174,8 @@ jobs:
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
-          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           set PREFIX=.
-          set NO_DIST=1
           set PYTHON=python
           call .\conda-recipe\bld.bat
           IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
@@ -187,27 +185,20 @@ jobs:
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
-          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           bash .ci/scripts/setup_sklearn.sh ${{ env.SKLEARN_VERSION }}
           pip install --upgrade -r requirements-test.txt
           for /f "delims=" %%c in ('python .ci\scripts\get_compatible_scipy_version.py') do set SCIPY_VERSION=%%c
           pip install %SCIPY_VERSION%
           # TEMPORARY FIX FOR ISSUES IN DPCTL PIP INSTALLATION
           set DPCTL_SUPPORTED=3.9 3.11
-          FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
-          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
+          for %%i in (%DPCTL_SUPPORTED%) do if ${{ env.PYTHON_VERSION }}==%%i pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           pip list
       - name: Sklearnex testing
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
-          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           set PYTHON=python
           cd ..
           call scikit-learn-intelex\conda-recipe\run_test.bat scikit-learn-intelex
@@ -215,19 +206,13 @@ jobs:
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
-          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           bash .ci/scripts/run_sklearn_tests.sh
       - name: Sklearn testing [preview]
         shell: cmd
         run: |
           call .\env2\Scripts\activate.bat
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
-          call .\dpcpp\compiler\${{ env.DPCPP_VERSION }}\env\vars.bat # prepare icx
-          call .\dpcpp\tbb\${{ env.TBB_VERSION }}\env\vars.bat # prepare tbb
-          call .\__release_win\daal\latest\env\vars.bat # prepare oneDAL
+          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }}
           set SKLEARNEX_PREVIEW=YES
           bash .ci/scripts/run_sklearn_tests.sh
   dpctl:
