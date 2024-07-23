@@ -21,17 +21,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}          
-      - name: Get run ID of "build_oneDAL" workflow
+      - name: Get run ID of "oneDAL-nightly" workflow
         id: get-run-id
         run: |
           OTHER_REPO="${{ github.repository }}"
-          WF_NAME="oneDAL nightly build"
+          WF_NAME="oneDAL-nightly"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --status completed --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Download artifact from "build_oneDAL" workflow
+      - name: Download oneDAL build artifact
         uses: actions/download-artifact@v4
         with:
           name: __release_lnx
@@ -105,18 +105,18 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}          
-      - name: Get run ID of "build_oneDAL" workflow
+      - name: Get run ID of "oneDAL-nightly" workflow
         id: get-run-id
         shell: bash
         run: |
           OTHER_REPO="${{ github.repository }}"
-          WF_NAME="oneDAL nightly build"
+          WF_NAME="oneDAL-nightly"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --status completed --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
         env:
           GH_TOKEN: ${{ github.token }}
-      - name: Download artifact from "build_oneDAL" workflow
+      - name: Download oneDAL build artifact
         uses: actions/download-artifact@v4
         with:
           name: __release_win
@@ -124,7 +124,7 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .\__release_win
-      - name: Download compiler
+      - name: Download DPCPP compiler artifact
         uses: actions/download-artifact@v4
         with:
           name: icx_compiler
@@ -132,7 +132,7 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
-      - name: Download Intel OpenCL CPU Runtime
+      - name: Download Intel OpenCL CPU Runtime artifact
         uses: actions/download-artifact@v4
         with:
           name: opencl_rt_installer
@@ -148,7 +148,7 @@ jobs:
       - name: Install Intel OpenCL CPU Runtime
         run: |
           echo "Installing OpenCL Runtime"
-          Start-Process msiexec -ArgumentList "/i opencl_rt.msi /qn" -Wait
+          Start-Process msiexec -ArgumentList "/i .\opencl_rt.msi /qn" -Wait
       - name: Set PATH Environment Variable
         shell: bash
         run: |
