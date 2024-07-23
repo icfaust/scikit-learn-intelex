@@ -61,7 +61,6 @@ jobs:
       - name: apt-get
         run: sudo apt-get update && sudo apt-get install -y clang-format
       - name: dpcpp installation
-        if: ${{ steps.set-env.outputs.DPCFLAG == '' }}
         run: bash .ci/scripts/install_dpcpp.sh
       - name: describe system
         run: bash .ci/scripts/describe_system.sh
