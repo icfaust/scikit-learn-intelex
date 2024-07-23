@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - PYTHON_VERSION: "3.9"
+          - PYTHON_VERSION: "3.10"
             SKLEARN_VERSION: "1.1"
     name: Linux_nightly/pip Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
     runs-on: ubuntu-latest
