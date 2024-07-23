@@ -147,8 +147,8 @@ jobs:
           echo "Unzip complete"
       - name: Install Intel OpenCL CPU Runtime
         run: |
-          echo "Installing OpenCL Runtime"
           Start-Process msiexec -ArgumentList "/i .\opencl_rt.msi /qn" -Wait
+          echo "Installed Intel OpenCL CPU Runtime"
       - name: Set Environment Variables
         shell: bash
         run: |
