@@ -150,7 +150,7 @@ jobs:
           echo "NO_DIST=1" >> "$GITHUB_ENV"
           # Determine dpctl support
           DPCFLAG="1"
-          if [ $(echo ${{ matrix.PYTHON_VERSION }} | grep ${{ env.DPCTL_PY_VERSIONS }}) ]; then DPCFLAG=''; fi
+          if [ $(echo ${{ matrix.PYTHON_VERSION }} | grep '3.9\|3.11') ]; then DPCFLAG=''; fi
           echo "DPCFLAG=${DPCFLAG}" >> "$GITHUB_OUTPUT"
       - name: Download Intel OpenCL CPU Runtime artifact
         if: ${{ steps.set-env.outputs.DPCFLAG == '' }}
