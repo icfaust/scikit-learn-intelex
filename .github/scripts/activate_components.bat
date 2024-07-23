@@ -17,13 +17,14 @@ rem ============================================================================
 
 rem %1 - dpcpp compiler version
 rem %2 - tbb version
+rem %3 - dpcpp activate flag
 
 set errorcode=0
 
 rem prepare vc
 call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
 rem prepare icx
-call .\dpcpp\compiler\%1\env\vars.bat
+if "%3"=="" call .\dpcpp\compiler\%1\env\vars.bat
 rem prepare tbb
 call .\dpcpp\tbb\%2\env\vars.bat
 rem prepare oneDAL
