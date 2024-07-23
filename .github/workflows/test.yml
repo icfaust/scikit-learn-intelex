@@ -13,12 +13,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - PYTHON_VERSION: 3.9
-            SKLEARN_VERSION: 1.0
-          - PYTHON_VERSION: 3.10
-            SKLEARN_VERSION: 1.1
-          - PYTHON_VERSION: 3.11
-            SKLEARN_VERSION: 1.2
+          - PYTHON_VERSION: "3.9"
+            SKLEARN_VERSION: "1.0"
+          - PYTHON_VERSION: "3.10"
+            SKLEARN_VERSION: "1.1"
+          - PYTHON_VERSION: "3.11"
+            SKLEARN_VERSION: "1.2"
     name: lnx_Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
     runs-on: ubuntu-latest
     steps:
@@ -96,12 +96,12 @@ jobs:
     strategy:
       matrix:
         include:
-          - PYTHON_VERSION: 3.9
-            SKLEARN_VERSION: 1.0
-          - PYTHON_VERSION: 3.10
-            SKLEARN_VERSION: 1.1
-          - PYTHON_VERSION: 3.11
-            SKLEARN_VERSION: 1.2
+          - PYTHON_VERSION: "3.9"
+            SKLEARN_VERSION: "1.0"
+          - PYTHON_VERSION: "3.10"
+            SKLEARN_VERSION: "1.1"
+          - PYTHON_VERSION: "3.11"
+            SKLEARN_VERSION: "1.2"
     name: win_Python${{ matrix.PYTHON_VERSION }}_Sklearn${{ matrix.SKLEARN_VERSION }}
     runs-on: windows-2022
     steps:
