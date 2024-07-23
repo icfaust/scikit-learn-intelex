@@ -155,7 +155,7 @@ jobs:
         run: |
           echo "C:\msys64\usr\bin;C:\Program Files (x86)\Common Files\Intel\Shared Libraries\bin;" >> $GITHUB_PATH
           # Disable SPMD testing
-          for i in "{${{ env.DPCTL_PY_VERSIONS}}}[@]" do echo "$i" done
+          for i in "${${{ env.DPCTL_PY_VERSIONS }}}[@]" do echo "$i" done
           echo "NO_DIST=1" >> "$GITHUB_ENV"
       - name: Install dependencies
         shell: cmd
