@@ -11,6 +11,7 @@ env:
 jobs:
   sklearn_lnx:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - PYTHON_VERSION: "3.9"
@@ -94,6 +95,7 @@ jobs:
           bash .ci/scripts/run_sklearn_tests.sh cpu
   sklearn_win:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - PYTHON_VERSION: "3.9"
