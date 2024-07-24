@@ -44,6 +44,7 @@ if __name__ == "__main__":
 
     pytest_args = (
         "--verbose --durations=100 --durations-min=0.01 "
+        "--rootdir=" + os.path.dirname(sklearn.__file__) + " "
         f'{os.environ["DESELECTED_TESTS"]} {os.environ["SELECTED_TESTS"]}'.split(" ")
     )
     while "" in pytest_args:
