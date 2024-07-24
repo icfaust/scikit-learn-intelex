@@ -43,7 +43,7 @@ if __name__ == "__main__":
         os.environ["SELECTED_TESTS"] = ""
 
     pytest_args = (
-        "--verbose --pyargs --durations=100 --durations-min=0.01 "
+        "--verbose --durations=100 --durations-min=0.01 "
         f'{os.environ["DESELECTED_TESTS"]} {os.environ["SELECTED_TESTS"]}'.split(" ")
     )
     while "" in pytest_args:
