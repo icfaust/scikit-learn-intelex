@@ -20,13 +20,14 @@ from sys import version_info as python_version
 if len(argv) == 1:
     from daal4py.sklearn._utils import sklearn_check_version
 else:
-    # This is necessary to prevent import errors from sklearnex and by extension 
+    # This is necessary to prevent import errors from sklearnex and by extension
     # sklearn caused by initial scipy and/or numpy versions that are installed.
     # It is written in a way to be `packaging` independent.
     def sklearn_check_version(ver):
-        ver = [int(i) for i if i != "" else 0 in ver.split(".")]
-        sk_ver = [int(i) for i if i != "" else 0 in str(argv[1]).split(".")]
+        ver = [int(i) if i != "" else 0 for i in ver.split(".")]
+        sk_ver = [int(i) if i != "" else 0 for i in str(argv[1]).split(".")]
         return sk_ver[0] > ver[0] or (sk_ver[0] == ver[0] and sk_ver[1] >= ver[1])
+
 
 if sklearn_check_version("1.4"):
     print("Scipy version is not specified for this sklearn/python version.", file=stderr)
