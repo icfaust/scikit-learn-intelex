@@ -49,6 +49,8 @@ if __name__ == "__main__":
     while "" in pytest_args:
         pytest_args.remove("")
 
+    print(pytest_args)
+    print("---------------<<-----------------')
     if args.device != "none":
         with sklearn.config_context(target_offload=args.device):
             return_code = pytest.main(pytest_args)
