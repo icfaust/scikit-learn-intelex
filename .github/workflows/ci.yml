@@ -97,13 +97,13 @@ jobs:
         run: |
           source env2/bin/activate
           source .github/scripts/activate_components.sh
-          bash .ci/scripts/run_sklearn_tests.sh cpu
+          bash .ci/scripts/run_sklearn_tests.sh
       - name: Sklearn testing [preview]
         run: |
           source env2/bin/activate
           source .github/scripts/activate_components.sh
           export SKLEARNEX_PREVIEW='YES'
-          bash .ci/scripts/run_sklearn_tests.sh cpu
+          bash .ci/scripts/run_sklearn_tests.sh
 
   sklearn_win:
     strategy:
