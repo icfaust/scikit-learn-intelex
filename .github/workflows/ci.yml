@@ -170,7 +170,7 @@ jobs:
           if [ $(echo ${{ matrix.PYTHON_VERSION }} | grep '${{ env.DPCTL_PY_VERSIONS }}') ]; then DPCFLAG=''; fi
           echo "DPCFLAG=${DPCFLAG}" >> "$GITHUB_OUTPUT"
           # Set proper environment variable for OpenCL CPU Runtime discovery when dpctl supported
-          if [ -z ${DPCFLAG} ]; then echo "OCL_ICD_FILENAMES=$(pwd)\dpcpp\${{ env.DPCPP_VERSION }}\bin\intelocl64.dll" >> "$GITHUB_ENV"; fi
+          if [ -z ${DPCFLAG} ]; then echo "OCL_ICD_FILENAMES=${{ GITHUB_WORKSPACE }}\dpcpp\${{ env.DPCPP_VERSION }}\bin\intelocl64.dll" >> "$GITHUB_ENV"; fi
       - name: Install dependencies
         shell: cmd
         run: |
