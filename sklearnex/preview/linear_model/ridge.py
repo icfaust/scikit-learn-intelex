@@ -283,8 +283,9 @@ if daal_check_version((2024, "P", 600)):
                 "multi_output": True,
             }
             if sklearn_check_version("1.2"):
-                X, y = self._validate_data(**check_params)
                 self._validate_params()
+            if sklearn_check_version("1.0"):
+                X, y = self._validate_data(**check_params)
             else:
                 X, y = check_X_y(**check_params)
 
