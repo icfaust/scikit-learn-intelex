@@ -256,8 +256,8 @@ jobs:
           call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }} ${{ steps.set-env.outputs.DPCFLAG }}
           set SKLEARNEX_PREVIEW=YES
           bash .ci/scripts/run_sklearn_tests.sh
-          dpctl:
-  name: dpctl_test
+  dpctl:
+    name: dpctl_test
     runs-on: windows-2022
     steps:
       - name: Checkout
