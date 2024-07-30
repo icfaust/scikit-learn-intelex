@@ -93,7 +93,6 @@ jobs:
           source ./env2/bin/activate
           source .github/scripts/activate_components.sh ${{ steps.set-env.outputs.DPCFLAG }}
           python setup.py install --single-version-externally-managed --record=record.txt
-          python setup_sklearnex.py install --single-version-externally-managed --record=record_sklearnex.txt
       - name: Install testing requirements
         run: |
           source ./env2/bin/activate
@@ -222,8 +221,6 @@ jobs:
           set PREFIX=.
           set PYTHON=python
           call .\conda-recipe\bld.bat
-          IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
-          python setup_sklearnex.py install --single-version-externally-managed --record=record_sklearnex.txt
       - name: Install testing requirements
         shell: cmd
         run: |
