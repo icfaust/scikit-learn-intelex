@@ -287,4 +287,6 @@ jobs:
           call C:\Miniconda\condabin\conda.bat config --append channels conda-forge https://software.repos.intel.com/python/conda/
           call C:\Miniconda\condabin\conda.bat create --name dpctl_env dpctl
           call C:\Miniconda\condabin\conda.bat activate dpctl_env
+          python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
+          pip list
