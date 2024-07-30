@@ -265,7 +265,7 @@ jobs:
       - name: Install Python
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: 3.9
       - name: Install dpctl
         shell: cmd
         run: |
@@ -275,7 +275,7 @@ jobs:
           set CONDA_PREFIX=$GITHUB_WORKSPACE\env2
           set OCL_ICD_FILENAMES=%CONDA_PREFIX%\Library\bin\intelocl64.dll
           set DPCTL_SUPPORTED=3.9 3.11
-          FOR %%i IN (%DPCTL_SUPPORTED%) DO if ${{ env.PYTHON_VERSION }}==%%i python -m pip install --index-url https://pypi.anaconda.org/intel/simple dpctl==0.17.0
+          FOR %%i IN (%DPCTL_SUPPORTED%) DO if 3.9==%%i python -m pip install --index-url https://pypi.anaconda.org/intel/simple dpctl==0.17.0
           python -c "import os, os.path, site; path_to_env = site.getsitepackages()[0]; path_to_libs = os.path.join(path_to_env, 'Library', 'bin'); temp=os.add_dll_directory(path_to_libs) if os.path.exists(path_to_libs) else None; import dpctl; print(dpctl.get_devices())"
           python -c "import dpctl; print(dpctl.lsplatform(2))"
           pip list
