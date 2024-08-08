@@ -56,7 +56,7 @@ jobs:
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
         env:
-          GH_TOKEN: ${{ secrets.INTEL_DAAL_PAT }}
+          GH_TOKEN: ${{ secrets.ONEDAL_TEST }}
       - name: Download oneDAL build artifact
         uses: actions/download-artifact@v4
         with:
