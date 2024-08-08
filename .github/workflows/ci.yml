@@ -62,7 +62,7 @@ jobs:
         with:
           name: __release_lnx
           github-token: ${{ secrets.ONEDAL_TEST }}
-          repository: "icfaust/oneDAL"
+          repository: "oneapi-src/oneDAL"
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: ./__release_lnx
       - name: Set Environment Variables
@@ -157,7 +157,7 @@ jobs:
         with:
           name: __release_win
           github-token: ${{ secrets.ONEDAL_TEST }}
-          repository: "icfaust/oneDAL"
+          repository: "oneapi-src/oneDAL"
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .\__release_win
       - name: Download DPCPP compiler artifact
@@ -165,7 +165,7 @@ jobs:
         with:
           name: icx_compiler
           github-token: ${{ secrets.ONEDAL_TEST }}
-          repository: "icfaust/oneDAL"
+          repository: "oneapi-src/oneDAL"
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
       - name: Unzip Compiler
@@ -190,7 +190,7 @@ jobs:
         with:
           name: opencl_rt_installer
           github-token: ${{ secrets.ONEDAL_TEST }}
-          repository: "icfaust/oneDAL"
+          repository: "oneapi-src/oneDAL"
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           path: .
       - name: Install Intel OpenCL CPU Runtime
