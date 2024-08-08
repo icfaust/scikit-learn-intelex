@@ -50,8 +50,8 @@ jobs:
       - name: Get run ID of "oneDAL-nightly" workflow
         id: get-run-id
         run: |
-          OTHER_REPO="icfaust/oneDAL"
-          WF_NAME="build-nightly"
+          OTHER_REPO="oneapi-src/oneDAL"
+          WF_NAME="nightly-build"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --status completed --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
@@ -145,8 +145,8 @@ jobs:
         id: get-run-id
         shell: bash
         run: |
-          OTHER_REPO="icfaust/oneDAL"
-          WF_NAME="build-nightly"
+          OTHER_REPO="oneapi-src/oneDAL"
+          WF_NAME="nightly-build"
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --status completed --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
