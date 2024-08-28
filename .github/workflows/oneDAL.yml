@@ -21,7 +21,7 @@ on:
 
 env:
   OTHER_REPO: "scikit-learn/scikit-learn"
-  WF_NAME: "CUDA GPU"
+  WF_NAME: "Wheel builder"
 
 permissions:
   contents: read
@@ -40,5 +40,25 @@ jobs:
           RUN_ID=`gh run --repo ${OTHER_REPO} list --workflow "${WF_NAME}" --json databaseId --jq .[0].databaseId`
           echo "Detected latest run id of ${RUN_ID} for workflow ${WF_NAME}"
           echo "run-id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Qualify "Nightly-build" workflow
+        run: |
+          STATUS=`gh run --repo ${OTHER_REPO} view ${{ steps.get-run-id.outputs.run-id }} --json status --exit-status --jq .status`
+          echo "Status of run: ${STATUS}"
+          # if latest nightly build is currently running, wait for it to complete and reacquire status
+          if [[ $STATUS == "queued" ]] || [[ $STATUS == "in_progress" ]]; then
+            gh run --repo ${OTHER_REPO} watch ${{ steps.get-run-id.outputs.run-id }} -i 300
+            STATUS=`gh run --repo ${OTHER_REPO} view ${{ steps.get-run-id.outputs.run-id }} --json status --exit-status --jq .status`
+          fi
+          T_R=`gh run --repo ${OTHER_REPO} view ${{ steps.get-run-id.outputs.run-id }} --json startedAt --exit-status --jq .startedAt`
+          # if the previous run is successful but older than 25 hours set an exit code
+          if [[ $STATUS == "completed" ]]; then exit $((($(date '+%s') - $(date -d ${T_R} '+%s'))/90000)); fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Download Artifacts
+        run: |
+          gh run --repo ${OTHER_REPO} download ${{ steps.get-run-id.outputs.run-id }}
+          ls -la
         env:
           GH_TOKEN: ${{ github.token }}
