@@ -197,6 +197,7 @@ def call_validate_data(text, estimator, method):
         print(text[0])
         print(_TRACE_ALLOW_DICT)
         print(_TRACE_BLOCK_LIST)
+        print(sys.path)
         pytest.fail("onedal backend not used in this function")
 
     validate_data = "validate_data" if sklearn_check_version("1.6") else "_validate_data"
