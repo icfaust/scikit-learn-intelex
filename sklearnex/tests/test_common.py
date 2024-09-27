@@ -95,7 +95,7 @@ def _whitelist_to_blacklist():
                 blacklist += [
                     f.path
                     for f in os.scandir(path)
-                    if f.name not in _TRACE_ALLOW_DICT.keys()
+                    if f.name not in _TRACE_ALLOW_DICT.keys() and not any([i in f.path for i in _TRACE_ALLOW_DICT.values()]):
                 ]
             else:
                 blacklist += [path]
