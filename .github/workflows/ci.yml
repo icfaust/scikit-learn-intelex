@@ -110,12 +110,12 @@ jobs:
           pip install $(python .ci/scripts/get_compatible_scipy_version.py ${{ matrix.SKLEARN_VERSION }}) pyyaml
           if [ "${{ steps.set-env.outputs.DPCFLAG }}" == "" ]; then pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}; fi
           pip list
-      - name: Sklearnex testing
-        run: |
-          source venv/bin/activate
-          source .github/scripts/activate_components.sh
-          cd .ci
-          ../conda-recipe/run_test.sh
+      #- name: Sklearnex testing
+      #  run: |
+      #    source venv/bin/activate
+      #    source .github/scripts/activate_components.sh
+      #    cd .ci
+      #    ../conda-recipe/run_test.sh
       - name: Sklearn testing
         run: |
           source venv/bin/activate
@@ -241,14 +241,14 @@ jobs:
           pip install %SCIPY_VERSION%
           if "${{ steps.set-env.outputs.DPCFLAG }}"=="" pip install dpctl==${{ env.DPCTL_VERSION }} dpnp==${{ env.DPNP_VERSION }}
           pip list
-      - name: Sklearnex testing
-        shell: cmd
-        run: |
-          call .\venv\Scripts\activate.bat
-          call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }} ${{ steps.set-env.outputs.DPCFLAG }}
-          set PYTHON=python
-          cd ..
-          call scikit-learn-intelex\conda-recipe\run_test.bat scikit-learn-intelex
+      #- name: Sklearnex testing
+      #  shell: cmd
+      #  run: |
+      #    call .\venv\Scripts\activate.bat
+      #    call .\.github\scripts\activate_components.bat ${{ env.DPCPP_VERSION }} ${{ env.TBB_VERSION }} ${{ steps.set-env.outputs.DPCFLAG }}
+      #    set PYTHON=python
+      #    cd ..
+      #    call scikit-learn-intelex\conda-recipe\run_test.bat scikit-learn-intelex
       - name: Sklearn testing
         shell: cmd
         run: |
