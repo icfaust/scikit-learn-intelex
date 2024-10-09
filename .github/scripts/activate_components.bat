@@ -22,6 +22,6 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Buil
 rem prepare icx only if no parameter is given.
 if "%1"=="" call .\oneapi\compiler\latest\env\vars.bat
 rem prepare tbb
-call .\oneapi\setvars.bat
+call .\oneapi\tbb\latest\env\vars.sh
 rem prepare oneDAL
 call .\__release_win\daal\latest\env\vars.bat
