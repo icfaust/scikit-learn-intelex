@@ -184,10 +184,7 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
-          set loc=.\oneapi\compiler
-          for /f "tokens=2 delims=[]" %%H in ('dir /al %loc%\ ^| findstr /i /c:"latest"') do rmdir %loc%\latest & mklink /D %loc%\latest .\%%~nxH
-          set loc=.\oneapi\tbb
-          for /f "tokens=2 delims=[]" %%H in ('dir /al %loc%\ ^| findstr /i /c:"latest"') do rmdir %loc%\latest & mklink /D %loc%\latest .\%%~nxH
+          for /D %%s in (.\oneapi\*) do for /f "tokens=2 delims=[]" %%H in ('dir /al %%s\ ^| findstr /i /c:"latest"') do rmdir %%s\latest & mklink /D %%s\latest .\%%~nxH
           echo "Unzip complete"
       - name: Set Environment Variables
         id: set-env
@@ -227,7 +224,7 @@ jobs:
         run: |
           call .\venv\Scripts\activate.bat
           call .\oneapi\setvars.bat
-          call sycl-ls.exe
+          call .\oneapi\compiler\latest\sycl-ls.exe
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
         shell: cmd
