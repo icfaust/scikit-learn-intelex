@@ -184,10 +184,11 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
-          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\compiler\ ^| findstr /i /c:"latest"') do echo %%~nxH
+          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\compiler\ ^| findstr /i /c:"latest"') do rmdir .\oneapi\compiler\latest & mklink /D .\oneapi\compiler\latest .\%%~nxH
           echo "hello"
           dir .\oneapi\compiler
-          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\tbb\ ^| findstr /i /c:"latest"') do for %%f in ("%%H") do set "target=%%~nxf"
+          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\tbb\ ^| findstr /i /c:"latest"') do rmdir .\oneapi\tbb\latest & mklink /D .\oneapi\tbb\latest .\%%~nxH
+          echo "hello"
           rmdir .\oneapi\tbb\latest
           mklink /D .\oneapi\tbb\latest .\%target%
           echo "Unzip complete"
