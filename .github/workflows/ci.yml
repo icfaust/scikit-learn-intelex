@@ -184,10 +184,11 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
-          rmdir .\oneapi\tbb\latest
           for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\compiler\ ^| findstr /i /c:"latest"') do for %%f in ("%%H") do set "target=%%~nxf"
           rmdir .\oneapi\compiler\latest
           mklink /D .\oneapi\compiler\latest .\%target%
+          echo %target%
+          echo "hello"
           dir .\oneapi\compiler
           for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\tbb\ ^| findstr /i /c:"latest"') do for %%f in ("%%H") do set "target=%%~nxf"
           rmdir .\oneapi\tbb\latest
