@@ -184,6 +184,10 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
+          dir .
+          dir .\oneapi
+          dir .\oneapi\compiler
+          dir .\oneapi\compiler\latest
           echo "Unzip complete"
       - name: Set Environment Variables
         id: set-env
