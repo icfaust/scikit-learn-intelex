@@ -184,10 +184,14 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
-          rmdir .\oneapi\compiler\latest
           rmdir .\oneapi\tbb\latest
-          mklink /D .\oneapi\compiler\latest .\2024.2
-          mklink /D .\oneapi\tbb\latest .\2021.13
+          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\compiler\ ^| findstr /i /c:"latest"') do for %%f in ("%%H") do set "target=%%~nxf"
+          rmdir .\oneapi\compiler\latest
+          mklink /D .\oneapi\compiler\latest .\%target%
+          dir .\oneapi\compiler
+          for /f "tokens=2 delims=[]" %%H in  ('dir /al .\oneapi\tbb\ ^| findstr /i /c:"latest"') do for %%f in ("%%H") do set "target=%%~nxf"
+          rmdir .\oneapi\tbb\latest
+          mklink /D .\oneapi\tbb\latest .\%target%
           echo "Unzip complete"
       - name: Set Environment Variables
         id: set-env
