@@ -223,7 +223,7 @@ jobs:
         run: |
           call .\venv\Scripts\activate.bat
           call .\oneapi\setvars.bat
-          call .\oneapi\compiler\latest\sycl-ls.exe
+          call .\oneapi\compiler\latest\bin\sycl-ls.exe
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
         shell: cmd
