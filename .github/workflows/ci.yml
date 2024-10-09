@@ -184,10 +184,6 @@ jobs:
         shell: cmd
         run: |
           tar -xvzf oneapi.tar.gz
-          dir .
-          dir .\oneapi
-          dir .\oneapi\compiler
-          dir .\oneapi\compiler\latest
           echo "Unzip complete"
       - name: Set Environment Variables
         id: set-env
@@ -226,8 +222,8 @@ jobs:
         shell: cmd
         run: |
           call .\venv\Scripts\activate.bat
-          call .\oneapi\compiler\latest\env\vars.bat
-          call .\oneapi\compiler\latest\bin\sycl-ls.exe
+          call .\oneapi\setvars.bat
+          call sycl-ls.exe
           bash .ci/scripts/describe_system.sh
       - name: Build daal4py/sklearnex
         shell: cmd
