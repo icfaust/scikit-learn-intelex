@@ -76,8 +76,6 @@ jobs:
       - name: Set Environment Variables
         id: set-env
         run: |
-          ls -lha .
-          ls -lha __release_lnx
           # Disable SPMD testing
           echo "NO_DIST=1" >> "$GITHUB_ENV"
           # Determine dpctl support
