@@ -412,3 +412,11 @@ def test_sua_iface_interop_if_no_dpc_backend(dataframe, queue, dtype):
     expected_err_msg = "SYCL usm array conversion to table requires the DPC backend"
     with pytest.raises(RuntimeError, match=expected_err_msg):
         to_table(X, sua_iface=sua_iface)
+
+def test_pytorch_xpu():
+    import torch
+    assert torch.xpu.is_available
+    tens = torch.from_numpy(np.mgrid[:20]).to("xpu")
+    print(tens.device)
+    print(torch.xpu.current_stream(tens.device).sycl_queue)
+    
