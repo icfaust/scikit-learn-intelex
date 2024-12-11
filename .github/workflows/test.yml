@@ -73,6 +73,7 @@ jobs:
       - name: Upload coverage reports to Codecov
         run: |
          ls -lha
+         ls -lha coverage
          python -m pip install coverage codecov-cli
          coverage combine ./coverage
          coverage xml
