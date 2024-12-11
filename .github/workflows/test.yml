@@ -75,5 +75,5 @@ jobs:
          ls -lha
          ls -lha coverage
          python -m pip install coverage codecov-cli
-         coverage combine ./coverage
+         find ./coverage -print0 | xargs -0 coverage combine
          coverage xml
