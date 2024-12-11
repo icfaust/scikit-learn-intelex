@@ -40,9 +40,8 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
           merge-multiple: true
-     - name: Install dependencies
+     - name: Install codecov cli
        run: |
-         python -m pip install coverage
          curl -Os https://cli.codecov.io/latest/linux/codecov
          chmod +x codecov
      - name: Upload to codecov
