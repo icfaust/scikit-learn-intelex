@@ -129,24 +129,24 @@ jobs:
         run: |
           source venv/bin/activate
           source .github/scripts/activate_components.sh
-          export COVERAGE_FILE=$(pwd)/.coverage.lnx.sklearnex_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
+          export COVERAGE_FILE=$(pwd)/.coverage.sklearnex
           cd .ci
           ../conda-recipe/run_test.sh
       - name: Sklearn testing
         run: |
           source venv/bin/activate
           source .github/scripts/activate_components.sh
-          export COVERAGE_FILE=$(pwd)/.coverage.lnx.sklearn_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
+          export COVERAGE_FILE=$(pwd)/.coverage.sklearn
           if [ "${{ steps.set-env.outputs.DPCFLAG }}" == "" ]; then export CPU=cpu; fi
           bash .ci/scripts/run_sklearn_tests.sh $CPU
-      - name: Archive coverage data
+      - name: Create coverage report
+        run: |
+          coverage combine .coverage.sklearnex .coverage.sklearn
+          coverage xml -o coverage.lnx${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
+      - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage_lnx_Py${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-          path: |
-             .coverage.lnx.sklearn_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-             .coverage.lnx.sklearnex_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-          include-hidden-files: true
+          path: coverage.lnx${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Sklearn testing [preview]
         run: |
           source venv/bin/activate
@@ -271,7 +271,7 @@ jobs:
           call .\venv\Scripts\activate.bat
           call .\.github\scripts\activate_components.bat ${{ steps.set-env.outputs.DPCFLAG }}
           set PYTHON=python
-          set COVERAGE_FILE=%cd%\.coverage.win.sklearnex_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
+          set COVERAGE_FILE=%cd%\.coverage.sklearnex
           cd ..
           call scikit-learn-intelex\conda-recipe\run_test.bat scikit-learn-intelex\
       - name: Sklearn testing
@@ -279,17 +279,18 @@ jobs:
         run: |
           call .\venv\Scripts\activate.bat
           call .\.github\scripts\activate_components.bat ${{ steps.set-env.outputs.DPCFLAG }}
-          set COVERAGE_FILE=%cd%\.coverage.win.sklearn_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
+          set COVERAGE_FILE=%cd%\.coverage.sklearn
           if "${{ steps.set-env.outputs.DPCFLAG }}"=="" set CPU=cpu
           bash .ci/scripts/run_sklearn_tests.sh %CPU%
-      - name: Archive coverage data
+      - name: Create coverage report
+        shell: cmd
+        run: |
+          coverage combine .coverage.sklearnex .coverage.sklearn
+          coverage xml -o coverage.win${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
+      - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage_win_Py${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-          path: |
-             .coverage.win.sklearn_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-             .coverage.win.sklearnex_${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
-          include-hidden-files: true
+          path: coverage.win${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Sklearn testing [preview]
         shell: cmd
         run: |
