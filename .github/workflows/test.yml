@@ -71,10 +71,10 @@ jobs:
           github-token: ${{ github.token }}
           run-id: ${{ steps.get-run-id.outputs.run-id }}
           merge-multiple: true
-      - name: Upload coverage reports to Codecov
+      - name: Install dependencies
         run: |
-         ls -lha
-         ls -lha coverage
          python -m pip install coverage codecov-cli
+      - name: Combine, convert and upload
          coverage combine ./coverage
          coverage xml
+         ls -lha
