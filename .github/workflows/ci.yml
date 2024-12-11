@@ -147,6 +147,7 @@ jobs:
       - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
+          name: coverage_lnx_Py${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
           path: coverage.lnx${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Sklearn testing [preview]
         run: |
@@ -292,6 +293,7 @@ jobs:
       - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
+          name: coverage_win_Py${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}
           path: coverage.win${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Sklearn testing [preview]
         shell: cmd
