@@ -34,14 +34,9 @@ jobs:
      - name: Install Python
        uses: actions/setup-python@v5
      - name: 'Download artifact'
-       uses: actions/github-script@v6
+       uses: actions/download-artifact@v4
        with:
-          script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: context.payload.workflow_run.id,
-            });
+          run_id: ${{ github.event.workflow_run.id }}
      - name: Upload coverage reports to Codecov
        run: |
          ls -lha
