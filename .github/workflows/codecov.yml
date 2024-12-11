@@ -28,7 +28,7 @@ concurrency:
 jobs:
   upload_coverage:
     runs-on: ubuntu-24.04
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Codecov
     steps:
      - name: Install Python
@@ -38,9 +38,14 @@ jobs:
        with:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
-     - name: Upload coverage reports to Codecov
+          merge-multiple: true
+     - name: Install dependencies
        run: |
-         ls -lha
-         python -m pip install coverage codecov-cli
-         coverage combine
-         codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n 'service'-${{ github.run_id }} -F service
+         python -m pip install coverage
+         curl -Os https://cli.codecov.io/latest/linux/codecov
+         chmod +x codecov
+     - name: Combine, convert and upload
+       run: |
+         coverage combine ./coverage
+         coverage xml
+         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n 'service'-${{ github.run_id }} -F service -f coverage.xml
