@@ -141,8 +141,9 @@ jobs:
           bash .ci/scripts/run_sklearn_tests.sh $CPU
       - name: Create coverage report
         run: |
-          python -m coverage combine .coverage.sklearnex .coverage.sklearn
-          python -m coverage xml -o coverage.lnx${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
+          source venv/bin/activate
+          coverage combine .coverage.sklearnex .coverage.sklearn
+          coverage xml -o coverage.lnx${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
@@ -285,8 +286,9 @@ jobs:
       - name: Create coverage report
         shell: cmd
         run: |
-          python -m coverage combine .coverage.sklearnex .coverage.sklearn
-          python -m coverage xml -o coverage.win${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
+          call .\venv\Scripts\activate.bat
+          coverage combine .coverage.sklearnex .coverage.sklearn
+          coverage xml -o coverage.win${{ matrix.PYTHON_VERSION }}_${{ matrix.SKLEARN_VERSION }}.xml
       - name: Archive coverage report
         uses: actions/upload-artifact@v4
         with:
