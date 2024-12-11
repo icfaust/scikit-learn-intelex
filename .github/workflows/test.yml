@@ -75,6 +75,7 @@ jobs:
         run: |
          python -m pip install coverage codecov-cli
       - name: Combine, convert and upload
+        run: |
          coverage combine ./coverage
          coverage xml
          ls -lha
