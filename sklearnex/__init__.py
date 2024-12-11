@@ -60,6 +60,7 @@ if onedal_iface_flag == "0":
     if _is_spmd_backend:
         __all__.append("spmd")
 
+print("init for codecov")
 
 from ._utils import set_sklearn_ex_verbose
 
