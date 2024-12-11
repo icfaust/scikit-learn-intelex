@@ -65,6 +65,8 @@ __all__ = ["covariance", "decomposition", "ensemble", "neighbors", "primitives",
 if _is_spmd_backend:
     __all__.append("spmd")
 
+print("test")
+
 if daal_check_version((2023, "P", 100)):
     __all__ += ["basic_statistics", "linear_model"]
 
