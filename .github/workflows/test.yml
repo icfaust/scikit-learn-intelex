@@ -82,5 +82,5 @@ jobs:
          coverage xml
       - name: Upload to codecov
         run: |
-         export CODECOV_NAME='service'-${{ github.event.number }}-${{ github.sha }}
-         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n $CODECOV_NAME -F service -f coverage.xml
+         export CODECOV_NAME=CI-${{ github.event.number }}-${{ github.sha }}
+         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n "${CODECOV_NAME}" -F github -f coverage.xml
