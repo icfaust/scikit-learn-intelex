@@ -59,6 +59,7 @@ if _is_dpc_backend:
     except ImportError:
         _is_spmd_backend = False
 
+print("nothing")
 
 __all__ = ["covariance", "decomposition", "ensemble", "neighbors", "primitives", "svm"]
 
