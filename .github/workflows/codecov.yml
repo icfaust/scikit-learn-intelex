@@ -54,3 +54,5 @@ jobs:
          # if a PR, pass proper information to codecov-cli about SHA, PR number
          if [ -n "${PR}" ]; then export VARARGS="${VARARGS}-${PR}-${SHA} -P ${PR} -C ${SHA}"; fi
          ./codecov -v upload-process -Z -t ${{ secrets.CODECOV_TOKEN }} $VARARGS -F github -s ./coverage
+       env:
+         GH_TOKEN: ${{ github.token }}
