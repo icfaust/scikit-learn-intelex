@@ -42,13 +42,11 @@ jobs:
           merge-multiple: true
      - name: Install codecov cli
        run: |
-         python3 -m pip install coverage
          curl -Os https://cli.codecov.io/latest/linux/codecov
          chmod +x codecov
      - name: Upload to codecov
        run: |
          export PR=${{ github.event.workflow_run.pull_requests[0].number }}
-         echo $PR
          export CODECOV_NAME=CI-$PR-${{ github.sha }}
          if [ -n "${PR}" ]; then export PR="-P ${PR}"; fi
          export SHA=${{ github.event.workflow_run.head_sha }}
