@@ -51,7 +51,7 @@ except ImportError:
 
 _is_spmd_backend = False
 
-print("test2")
+print("test3")
 
 if _is_dpc_backend:
     try:
