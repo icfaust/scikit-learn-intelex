@@ -46,7 +46,7 @@ jobs:
          chmod +x codecov
      - name: Upload to codecov
        run: |
-         export PR=$("$GITHUB_REF | awk -F / '{print $3}')
+         export PR=$("$GITHUB_REF" | awk -F / '{print $3}')
          echo $PR
          if [ -n "${PR}" ]; then export PR="-P ${PR}"; fi
          echo here
