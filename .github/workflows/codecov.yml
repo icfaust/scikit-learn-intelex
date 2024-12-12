@@ -46,8 +46,11 @@ jobs:
          chmod +x codecov
      - name: Upload to codecov
        run: |
-         export PR=$("$GITHUB_REF" | awk -F / '{print $3}')
+         export PR=${{ github.event.workflow_run.pull_requests[0].number }}
+         echo ${{ github.event.workflow_run.triggering_actor.url }}
+         PR2=`gh pr view ${{ github.event.workflow_run.head_branch }} --json number -q .number`
          echo $PR
+         echo $PR2
          if [ -n "${PR}" ]; then export PR="-P ${PR}"; fi
          echo here
          echo $PR
