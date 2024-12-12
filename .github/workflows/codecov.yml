@@ -46,7 +46,8 @@ jobs:
          chmod +x codecov
      - name: Upload to codecov
        run: |
-         echo ${{ github.event.workflow_run.head_branch }}
+         PR2=`gh pr view ${{ github.event.workflow_run.head_branch }} --json number -q .number`
+         echo $PR2
          export PR=${{ github.event.workflow_run.pull_requests[0].number }}
          export SHA=${{ github.event.workflow_run.head_sha }}
          export VARARGS="-n github"
