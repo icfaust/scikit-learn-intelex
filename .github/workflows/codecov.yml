@@ -47,4 +47,5 @@ jobs:
      - name: Upload to codecov
        run: |
          export CODECOV_NAME=CI-${{ github.event.number }}-${{ github.sha }}
-         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n "${CODECOV_NAME}" -F github -s ./coverage
+         export SHA=${{ github.event.workflow_run.head_sha }}
+         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n $CODECOV_NAME -C $SHA -F github -s ./coverage
