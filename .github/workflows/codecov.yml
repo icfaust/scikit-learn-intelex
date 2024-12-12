@@ -49,9 +49,9 @@ jobs:
          if [ $(git branch --show-current) != $BRANCH ]; then PR=$(gh pr view $BRANCH --json number -q .number); fi
          echo uploading $BRANCH
          SHA=${{ github.event.workflow_run.head_sha }}
-         VARARGS="-n github"
-         # if a PR, pass proper information to codecov-cli about SHA, PR number
-         if [ -n "${PR}" ]; then VARARGS="${VARARGS}-${PR}-${SHA} -P ${PR} -C ${SHA}"; fi
+         VARARGS="-C ${SHA} -n github-${SHA}"
+         # if a PR, pass proper information to codecov-cli about the PR number
+         if [ -n "${PR}" ]; then VARARGS="${VARARGS}-${PR} -P ${PR}"; fi
          ./codecov -v upload-process -Z -t ${{ secrets.CODECOV_TOKEN }} $VARARGS -F github -s ./coverage
        env:
          GH_TOKEN: ${{ github.token }}
