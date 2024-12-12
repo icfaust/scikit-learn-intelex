@@ -56,5 +56,5 @@ jobs:
        env:
          GH_TOKEN: ${{ github.token }}
          BRANCH: ${{ github.event.workflow_run.head_branch }}
-         NAME: $${{ github.event.workflow_run.head_repository.name }}
+         NAME: ${{ github.event.workflow_run.head_repository.name }}
          FULL_NAME: ${{ github.event.workflow_run.head_repository.full_name }}
