@@ -46,13 +46,16 @@ jobs:
          chmod +x codecov
      - name: Upload to codecov
        run: |
-         PR2=`gh pr view ${{ github.event.workflow_run.head_branch }} --json number -q .number`
-         echo $PR2
-         export PR=${{ github.event.workflow_run.pull_requests[0].number }}
-         export SHA=${{ github.event.workflow_run.head_sha }}
-         export VARARGS="-n github"
+         # github does not reliably return the PR number for workflow_run. This workaround will get the PR (if a PR)
+         if [ "${{ github.repository_owner }}" != "${OWNER}" ]; then BRANCH="${OWNER}:${BRANCH}"; fi
+         if [ $(git branch --show-current) != $BRANCH ]; then PR=$(gh pr view $BRANCH --json number -q .number); fi
+         echo uploading $BRANCH
+         SHA=${{ github.event.workflow_run.head_sha }}
+         VARARGS="-n github"
          # if a PR, pass proper information to codecov-cli about SHA, PR number
-         if [ -n "${PR}" ]; then export VARARGS="${VARARGS}-${PR}-${SHA} -P ${PR} -C ${SHA}"; fi
+         if [ -n "${PR}" ]; then VARARGS="${VARARGS}-${PR}-${SHA} -P ${PR} -C ${SHA}"; fi
          ./codecov -v upload-process -Z -t ${{ secrets.CODECOV_TOKEN }} $VARARGS -F github -s ./coverage
        env:
          GH_TOKEN: ${{ github.token }}
+         BRANCH: ${{ github.event.workflow_run.head_branch }}
+         OWNER: ${{ github.event.workflow_run.head_repository.owner.name }}
