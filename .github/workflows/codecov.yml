@@ -28,7 +28,7 @@ concurrency:
 jobs:
   upload_coverage:
     runs-on: ubuntu-24.04
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.repository == 'icfaust/scikit-learn-intelex' && github.event.workflow_run.conclusion == 'success' }}
     name: Codecov
     steps:
      - name: Checkout Scikit-learn-intelex
