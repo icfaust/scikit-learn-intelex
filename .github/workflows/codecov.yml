@@ -46,6 +46,11 @@ jobs:
          chmod +x codecov
      - name: Upload to codecov
        run: |
+         export PR=$("$GITHUB_REF | awk -F / '{print $3}')
+         echo $PR
+         if [ -n "${PR}" ]; then export PR="-P ${PR}"; fi
+         echo here
+         echo $PR
          export CODECOV_NAME=CI-${{ github.event.number }}-${{ github.sha }}
          export SHA=${{ github.event.workflow_run.head_sha }}
-         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n $CODECOV_NAME -C $SHA -F github -s ./coverage
+         ./codecov --verbose upload-process --fail-on-error -t ${{ secrets.CODECOV_TOKEN }} -n $CODECOV_NAME -C $SHA -F github -s ./coverage $PR
