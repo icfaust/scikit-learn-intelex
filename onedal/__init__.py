@@ -51,6 +51,8 @@ except ImportError:
 
 _is_spmd_backend = False
 
+print("test7")
+
 if _is_dpc_backend:
     try:
         import onedal._onedal_py_spmd_dpc as _spmd_backend
