@@ -16,6 +16,32 @@
 # limitations under the License.
 # ==============================================================================
 
+# Environment variables which impact build process:
+#
+#   DALROOT
+#      folder location of oneDAL (required)
+#
+#   MPIROOT
+#      folder location of MPI (required if NO_DIST not set)
+#
+#   NO_DIST
+#      build sklearnex without MPI support
+#
+#   NO_DPC
+#      build oneDAL interfaces without SYCL support
+#
+#   NO_STREAM
+#      disables building daal4py with streaming mode
+#
+#   OFF_ONEDAL_IFACE:
+#      do not build or use oneDAL interfaces (e.g. DAAL support only)
+#
+#   MAX_JOBS:
+#      maximum number of jobs used for compilation (default: number of processors)
+#
+#   ONEDAL_COVERAGE:
+#      build oneDAL pybind11 interfaces with gcov (gcc, icpx/icx compilers only)
+#
 import glob
 
 # System imports
