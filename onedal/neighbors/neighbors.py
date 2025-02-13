@@ -738,9 +738,11 @@ class NearestNeighbors(NeighborsBase):
 
     def _onedal_predict(self, model, X, params, queue):
         if type(self._onedal_model) is kdtree_knn_classification_model:
-            return kdtree_knn_classification_prediction(**params).compute(X, model)
+            _X = X.copy()
+            return kdtree_knn_classification_prediction(**params).compute(_X, model)
         elif type(self._onedal_model) is bf_knn_classification_model:
-            return bf_knn_classification_prediction(**params).compute(X, model)
+            _X = X.copy()
+            return bf_knn_classification_prediction(**params).compute(_X, model)
 
         policy = self._get_policy(queue, X)
         X = to_table(X, queue=queue)
