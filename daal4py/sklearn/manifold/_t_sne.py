@@ -317,6 +317,9 @@ class TSNE(BaseTSNE):
                 )
 
             t0 = time()
+            # force a copy of the internally used X data rather than using a reference
+            # just for testing
+            knn._fit_X = X.copy()
             distances_nn = knn.kneighbors_graph(mode="distance")
             duration = time() - t0
             if self.verbose:
