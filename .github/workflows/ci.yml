@@ -60,6 +60,7 @@ jobs:
       - name: Get run ID of "Nightly-build" workflow
         id: get-run-id
         run: |
+          echo $CONDA
           OTHER_REPO="icfaust/oneDAL"
           WF_NAME="Nightly-build"
           JQ_QUERY='map(select(.event == "workflow_dispatch" or .event == "schedule")) | .[0].databaseId'
