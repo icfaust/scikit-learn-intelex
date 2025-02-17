@@ -56,7 +56,6 @@ jobs:
       - name: install test
         run: |
           sudo apt-get install abigail-tools
-          abidiff --help
       - name: Get run ID of "Nightly-build" workflow
         id: get-run-id
         run: |
@@ -111,6 +110,9 @@ jobs:
           repository: uxlfoundation/oneDAL
           run-id: ${{ steps.get-run-id1.outputs.run-id }}
           path: .ci/env1
+      - name: see what happens
+        run: |
+          abidiff __release_lnx/daal/latest/lib/intel64/libonedal_core.so __release_lnx1/daal/latest/lib/intel64/libonedal_core.so
       - name: Set Environment Variables
         id: set-env
         run: |
