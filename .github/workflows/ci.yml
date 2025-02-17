@@ -55,7 +55,7 @@ jobs:
           python-version: ${{ matrix.PYTHON_VERSION }}
       - name: install test
         run: |
-          sudo apt-get install libabigail-dev
+          sudo apt-get install abigail-tools
           abidiff --help
       - name: Get run ID of "Nightly-build" workflow
         id: get-run-id
