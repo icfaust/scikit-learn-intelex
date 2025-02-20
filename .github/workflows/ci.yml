@@ -50,6 +50,23 @@ jobs:
     steps:
       - run: echo still runs
 
+  job3:
+    needs: job1
+    if: ${{ true && false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo doesn't run
+
+  job4:
+    needs: job1
+    if: |
+      ${{ true &&
+      false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo doesn't run
+
+
   sklearn_lnx:
     strategy:
       fail-fast: false
