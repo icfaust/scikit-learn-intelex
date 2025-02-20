@@ -58,7 +58,6 @@ jobs:
       - run: echo doesn't run
 
   job4:
-    needs: job1
     if: |
       ${{ true &&
       false }}
