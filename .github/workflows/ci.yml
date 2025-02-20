@@ -60,7 +60,7 @@ jobs:
   job4:
     if: |
       true &&
-      ! false
+      ! true
     runs-on: ubuntu-latest
     steps:
       - run: "echo doesn't run"
