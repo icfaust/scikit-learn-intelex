@@ -35,6 +35,21 @@ env:
   DPCTL_PY_VERSIONS: '3.9\|3.11'
 
 jobs:
+
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo First Job
+
+  job2:
+    needs: job1
+    if: |
+      ${{ true &&
+      false }}
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo still runs
+
   sklearn_lnx:
     strategy:
       fail-fast: false
