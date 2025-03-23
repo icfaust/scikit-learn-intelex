@@ -22,6 +22,7 @@ import numpy as np
 from readcsv import pd_read_csv
 
 import daal4py as d4p
+from sklearnex.svm import SVC
 
 
 def main(readcsv=pd_read_csv):
@@ -41,9 +42,12 @@ def main(readcsv=pd_read_csv):
         training=d4p.svm_training(method="thunder"),
         prediction=d4p.svm_prediction(),
     )
-
+    est0 = SVC(probability=True)
+    est1 = SVC()
     # Pass data to training. Training result provides model
     train_result = algorithm.compute(train_data, train_labels)
+    est0.fit(train_data, train_labels)
+    est1.fit(train_data, train_labels)
     assert train_result.model.NumberOfFeatures == nFeatures
     assert isinstance(train_result.model.TwoClassClassifierModel(0), d4p.svm_model)
 
@@ -59,10 +63,15 @@ def main(readcsv=pd_read_csv):
         training=d4p.svm_training(method="thunder"),
         prediction=d4p.svm_prediction(),
     )
+
     # Pass data to prediction. Prediction result provides prediction
     pred_result = algorithm.compute(pred_data, train_result.model)
+    res0 = est0.predict_proba(pred_data)
+    res1 = est1.predict(pred_data)
     assert pred_result.prediction.shape == (train_data.shape[0], 1)
-
+    print(pred_result.prediction[0:20])
+    print(res0[0:20])
+    print(res1[0:20])
     return (pred_result, pred_labels)
 
 
