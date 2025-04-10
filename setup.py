@@ -263,14 +263,21 @@ def get_build_options():
     # FIXME it is a wrong place for this dependency
     if not no_dist:
         include_dir_plat.append(mpi_root + "/include")
-    using_intel = os.environ.get("cc", "") in [
-        "icc",
-        "icpc",
-        "icl",
-        "dpcpp",
-        "icx",
-        "icpx",
-    ]
+
+    using_intel = any(
+        [
+            intel_exec in os.environ.get("CXX", "")
+            for intel_exec in [
+                "icc",
+                "icpc",
+                "icl",
+                "dpcpp",
+                "icx",
+                "icpx",
+            ]
+        ]
+    )
+
     eca = [
         "-DPY_ARRAY_UNIQUE_SYMBOL=daal4py_array_API",
         '-DD4P_VERSION="' + sklearnex_version + '"',
@@ -415,6 +422,16 @@ class onedal_build:
         self.onedal_run()
         super(onedal_build, self).run()
         self.onedal_post_build()
+        if hasattr(self, "build_lib"):
+            # swap out __version__ before install
+            for p in ["onedal", "sklearnex"]:
+                loc = os.sep.join((self.build_lib, p, "__init__.py"))
+                if os.path.isfile(loc):
+                    with open(loc, "r+") as f:
+                        data = f.read().replace("2199.9.9", sklearnex_version)
+                        f.seek(0)
+                        f.write(data)
+                        f.truncate()
 
     def onedal_run(self):
         n_threads = self.parallel
@@ -437,6 +454,7 @@ class onedal_build:
             iface=iface,
             cxx=cxx,
             onedal_major_binary_version=ONEDAL_MAJOR_BINARY_VERSION,
+            mpi_root=mpi_root,
             no_dist=no_dist,
             use_parameters_lib=use_parameters_lib,
             use_abs_rpath=USE_ABS_RPATH,
@@ -565,7 +583,7 @@ if build_distribute:
 
 setup(
     name="scikit-learn-intelex",
-    description="Intel(R) Extension for Scikit-learn is a "
+    description="Extension for Scikit-learn is a "
     "seamless way to speed up your Scikit-learn application.",
     long_description=long_description,
     long_description_content_type="text/markdown",
