@@ -18,7 +18,7 @@ from contextlib import contextmanager
 
 from .._config import _get_config
 from ..datatypes import get_pytorch_queue, kDLOneAPI
-from ._third_party import SyclQueue
+from ._third_party import is_pytorch_tensor, SyclQueue
 
 # This special object signifies that the queue system should be
 # disabled. It will force computation to host. This occurs when the
