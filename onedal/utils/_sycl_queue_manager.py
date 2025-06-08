@@ -17,6 +17,7 @@
 from contextlib import contextmanager
 
 from .._config import _get_config
+from ..datatypes import kDLOneAPI
 from ._third_party import SyclQueue
 
 # This special object signifies that the queue system should be
@@ -26,6 +27,8 @@ from ._third_party import SyclQueue
 __fallback_queue = object()
 # single instance of global queue
 __global_queue = None
+# dictionary of generic dlpack queues for reuse
+__dlpack_queue = {}
 
 
 def __create_sycl_queue(target):
@@ -94,6 +97,30 @@ def fallback_to_host():
     """Enforce a host queue."""
     global __global_queue
     __global_queue = __fallback_queue
+
+
+def _get_dlpack_queue(obj: object) -> SyclQueue:
+    # users should not require direct use of this
+    device_type, device_id = obj.__dlpack_device__()
+    if device_type != kDLOneAPI:
+        return None
+
+    if is_pytorch_tensor(obj):
+        return get_pytorch_queue(obj)
+    else:
+        # no specialized queue can be extracted,
+        # use or generate a generic. Note, this
+        # will behave in unexpected ways for
+        # non-default SYCL contexts or with SYCL
+        # sub-devices due to limitations in the
+        # dlpack standard (not enough info).
+        try:
+            queue = __dlpack_queue[device_id]
+        except KeyError:
+            # use filter string capability to yield a queue
+            queue = SyclQueue(str(device_id))
+            __dlpack_queue[device_id] = queue
+        return queue
 
 
 def from_data(*data):
