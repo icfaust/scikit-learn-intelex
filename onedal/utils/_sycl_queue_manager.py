@@ -17,7 +17,7 @@
 from contextlib import contextmanager
 
 from .._config import _get_config
-from ..datatypes import kDLOneAPI
+from ..datatypes import get_pytorch_queue, kDLOneAPI
 from ._third_party import SyclQueue
 
 # This special object signifies that the queue system should be
