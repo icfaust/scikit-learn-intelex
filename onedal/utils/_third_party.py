@@ -27,7 +27,7 @@ import sys
 from typing import Callable
 
 from daal4py.sklearn._utils import _package_check_version
-
+from array_api_compat import is_pytorch_tensor
 
 @functools.lru_cache(maxsize=256, typed=False)
 def is_dpctl_available(version=None):
