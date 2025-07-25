@@ -18,6 +18,9 @@ from sklearn.base import RegressorMixin
 from sklearn.linear_model._ridge import _BaseRidge, _RidgeClassifierMixin
 from sklearn.lienar_model import RidgeClassifier as _sklearn_RidgeClassifier
 
+from daal4py.sklearn._utils import sklearn_check_version
+
+from ..._device_offload import dispatch
 from ...linear_model import Ridge
 
 # oneDAL array API enabled based on Ridge version
