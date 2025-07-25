@@ -28,6 +28,9 @@ class RidgeClassifier(_RidgeClassifierMixin, Ridge):
     __doc__ = RidgeClassifier.__doc__
     __sklearn_tags__ = _sklearnRidgeClassifier.__sklearn_tags__
 
+    if sklearn_check_version("1.2"):
+        _parameter_constraints = _sklearn_RidgeClassifier._parameter_constraints
+    
     def fit(self, X, y, sample_weight=None):
         X, y, sample_weight, Y = self._prepare_data(X, y, sample_weight, self.solver)
         if sklearn_check_version("1.2"):
