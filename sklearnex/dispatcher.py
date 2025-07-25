@@ -46,12 +46,15 @@ def get_patch_map_core(preview=False):
         if _is_new_patching_available():
             import sklearn.covariance as covariance_module
             import sklearn.decomposition as decomposition_module
+            import sklearn.linear_model as linear_model_module
+
 
             # Preview classes for patching
             from .preview.covariance import (
                 EmpiricalCovariance as EmpiricalCovariance_sklearnex,
             )
             from .preview.decomposition import IncrementalPCA as IncrementalPCA_sklearnex
+            from .preview.linear_model import RidgeClassifier as RidgeClassifier_sklearnex
 
             # Since the state of the lru_cache without preview cannot be
             # guaranteed to not have already enabled sklearnex algorithms
@@ -82,6 +85,18 @@ def get_patch_map_core(preview=False):
                 ]
             ]
 
+            # RidgeClassifier
+            mapping["ridgeclassifier"] = [
+                [
+                    (
+                        linear_model_module,
+                        "RidgeClassifier",
+                        RidgeClassifier_sklearnex,
+                    ),
+                    None,
+                ]
+            ]
+        
         return mapping
 
     from daal4py.sklearn.monkeypatch.dispatcher import _get_map_of_algorithms
