@@ -27,6 +27,7 @@ from ...linear_model import Ridge
 class RidgeClassifier(_RidgeClassifierMixin, Ridge):
     __doc__ = RidgeClassifier.__doc__
     __sklearn_tags__ = _sklearnRidgeClassifier.__sklearn_tags__
+    __init__ = _sklearn_RidgeClassifier.__init__
 
     if sklearn_check_version("1.2"):
         _parameter_constraints = _sklearn_RidgeClassifier._parameter_constraints
