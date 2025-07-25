@@ -48,7 +48,7 @@ class RidgeClassifier(_RidgeClassifierMixin, Ridge):
             )
         return self
 
-    fit.__doc__ = Ridge.fit.__doc__
+    fit.__doc__ = _sklearn_RidgeClassifier.fit.__doc__
 
 
 # remove RegressorMixin from the mro
