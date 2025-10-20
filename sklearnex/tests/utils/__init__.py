@@ -42,7 +42,6 @@ __all__ = [
     "gen_dataset",
     "gen_sparse_dataset",
     "sklearn_clone_dict",
-    "DummyEstimator",
 ]
 
 _IS_INTEL = "GenuineIntel" in _get_processor_info()
