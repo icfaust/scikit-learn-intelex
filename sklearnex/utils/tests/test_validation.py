@@ -24,7 +24,8 @@ from onedal.tests.utils._dataframes_support import (
     get_dataframes_and_queues,
 )
 from sklearnex import config_context
-from sklearnex.tests.utils import DummyEstimator, gen_dataset
+from sklearnex.dummy import DummyRegressor
+from sklearnex.tests.utils import gen_dataset
 from sklearnex.utils.validation import _check_sample_weight, validate_data
 
 # array_api support starts in sklearn 1.2, and array_api_strict conformance starts in sklearn 1.3
@@ -46,7 +47,7 @@ _dataframes_supported = (
 )
 @pytest.mark.parametrize("ensure_all_finite", ["allow-nan", True])
 def test_sum_infinite_actually_finite(dtype, shape, ensure_all_finite):
-    est = DummyEstimator()
+    est = DummyRegressor()
     X = np.empty(shape, dtype=dtype)
     X.fill(np.finfo(dtype).max)
     X = np.atleast_2d(X)
@@ -73,7 +74,7 @@ def test_sum_infinite_actually_finite(dtype, shape, ensure_all_finite):
 def test_validate_data_random_location(
     dataframe, queue, dtype, shape, ensure_all_finite, check, seed
 ):
-    est = DummyEstimator()
+    est = DummyRegressor()
     rand.seed(seed)
     X = rand.uniform(high=np.finfo(dtype).max, size=shape).astype(dtype)
 
@@ -116,7 +117,7 @@ def test_validate_data_random_location(
 def test_validate_data_random_shape_and_location(
     dataframe, queue, dtype, ensure_all_finite, check, seed
 ):
-    est = DummyEstimator()
+    est = DummyRegressor()
     lb, ub = 32768, 1048576  # lb is a patching condition, ub 2^20
     rand.seed(seed)
     X = rand.uniform(high=np.finfo(dtype).max, size=rand.randint(lb, ub)).astype(dtype)
@@ -211,7 +212,7 @@ def test_validate_data_output(dtype, dataframe, queue):
     # with sklearn array_api support which began in sklearn 1.2. This would assume
     # that somewhere upstream of the validate_data call, a data conversion of dpnp,
     # dpctl, or array_api inputs to numpy inputs would have occurred.
-    est = DummyEstimator()
+    est = DummyRegressor()
     X, y = gen_dataset(est, queue=queue, target_df=dataframe, dtype=dtype)[0]
 
     dispatch = {}
