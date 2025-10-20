@@ -29,6 +29,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import KFold
 
 from onedal import _default_backend as backend
+from onedal.dummy import DummyEstimator
 from onedal.tests.utils._dataframes_support import (
     _convert_to_dataframe,
     get_dataframes_and_queues,
@@ -40,7 +41,6 @@ from sklearnex.tests.utils import (
     PATCHED_FUNCTIONS,
     PATCHED_MODELS,
     SPECIAL_INSTANCES,
-    DummyEstimator,
 )
 
 CPU_SKIP_LIST = (
