@@ -590,8 +590,8 @@ def test_array_api_logreg(dataframe, queue, y_type):
     """Test LogisticRegression with Array API dispatch enabled.
 
     Tests cover:
-    - GPU: dpnp/dpctl arrays with newton-cg solver
-    - CPU: dpnp/dpctl and array_api_strict arrays with lbfgs solver
+    - GPU: dpnp arrays with newton-cg solver
+    - CPU: dpnp and array_api_strict arrays with lbfgs solver
     - Both numeric and string label targets
 
     Validates that:

@@ -142,7 +142,7 @@ def test_roc_auc_score_patching(caplog, dataframe, queue, dtype):
 
 def _check_estimator_patching(caplog, dataframe, queue, dtype, est, method):
     # This should be modified as more array_api frameworks are tested and for
-    # upcoming changes in dpnp and dpctl
+    # upcoming changes in dpnp
 
     result = None
     with caplog.at_level(logging.WARNING, logger="sklearnex"):
@@ -246,7 +246,7 @@ def _check_output_type(result, y, method, estimator_name, caplog, X, est=None):
 
             # Check device alignment: if input was on GPU, output
             # should also be on the same device. Uses standard array API
-            # `.device` attribute for compatibility with torch, dpnp, dpctl, etc.
+            # `.device` attribute for compatibility with torch, dpnp, etc.
             if hasattr(X, "device"):
                 assert hasattr(res, "device")
                 assert X.device == res.device
@@ -539,7 +539,7 @@ def test_standard_estimator_patching(caplog, dataframe, queue, dtype, estimator,
         (
             dataframe == "array_api"
             or (
-                dataframe in ["dpctl", "dpnp"]
+                dataframe in ["dpnp"]
                 and (not queue or not getattr(queue.sycl_device, "is_gpu", False))
             )
         )
@@ -604,7 +604,7 @@ def test_standard_estimator_patching(caplog, dataframe, queue, dtype, estimator,
                 _check_set_output_transform(est, method, X, estimator)
 
     else:
-        if dataframe in ["dpctl", "dpnp"]:
+        if dataframe == "dpnp":
             # Note: this tries to check for GPU support by checking for array API
             # support. If some class can run on GPU but doesn't support array API,
             # an exception should be made here.
@@ -616,7 +616,7 @@ def test_standard_estimator_patching(caplog, dataframe, queue, dtype, estimator,
         )
         # KNN/LOF store _fit_X as dpnp even without dispatch, so pickle
         # fails (dpnp SYCL queues are not serializable)
-        if dataframe in ["dpnp", "dpctl"] and estimator not in [
+        if dataframe == "dpnp" and estimator not in [
             "KNeighborsClassifier",
             "KNeighborsRegressor",
             "NearestNeighbors",
@@ -624,7 +624,7 @@ def test_standard_estimator_patching(caplog, dataframe, queue, dtype, estimator,
         ]:
 
             pickle.loads(pickle.dumps(est))
-        # Without array_api_dispatch, dpnp/dpctl inputs go through
+        # Without array_api_dispatch, dpnp inputs go through
         # support_input_format (converts to numpy and back) for fit and
         # support_sycl_format (converts to numpy but NOT back) for some
         # methods like score_samples/mahalanobis. This creates a type
@@ -633,8 +633,6 @@ def test_standard_estimator_patching(caplog, dataframe, queue, dtype, estimator,
         # use array API consistently, so we re-fit and re-call with
         # dispatch on to verify output types correctly.
         if dataframe not in ("numpy", "pandas"):
-            if dataframe == "dpctl":
-                pytest.skip("dpctl.tensor is deprecated and incomplete for array API")
             # Skip second pass if estimator doesn't support GPU for this data
             if queue is not None and getattr(queue.sycl_device, "is_gpu", False):
                 X_np, y_np = _as_numpy(X), _as_numpy(y)
@@ -657,7 +655,7 @@ def test_special_estimator_patching(caplog, dataframe, queue, dtype, estimator, 
     est = SPECIAL_INSTANCES[estimator]
 
     if queue:
-        # Its not possible to get the dpnp/dpctl arrays to be in the proper dtype
+        # Its not possible to get the dpnp arrays to be in the proper dtype
         if dtype == np.float16 and not queue.sycl_device.has_aspect_fp16:
             pytest.skip("Hardware does not support fp16 SYCL testing")
         elif dtype == np.float64 and not queue.sycl_device.has_aspect_fp64:

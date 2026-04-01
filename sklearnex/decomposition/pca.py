@@ -116,7 +116,7 @@ if daal_check_version((2024, "P", 100)):
                 self.random_state = random_state
 
         _onedal_PCA = staticmethod(onedal_PCA)
-        # guarantee operability with dpnp/dpctl, runs on CPU unless
+        # guarantee operability with dpnp, runs on CPU unless
         # array_api_dispatch is enabled.
         score_samples = support_sycl_format(_sklearn_PCA.score_samples)
 

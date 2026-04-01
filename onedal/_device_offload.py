@@ -23,7 +23,7 @@ import numpy as np
 from sklearn import get_config
 
 from ._config import _get_config
-from .datatypes import copy_to_dpnp, copy_to_usm, dlpack_to_numpy
+from .datatypes import copy_to_dpnp, dlpack_to_numpy
 from .utils import _sycl_queue_manager as QM
 from .utils._array_api import _asarray, _get_sycl_namespace, _is_numpy_namespace
 from .utils._third_party import is_dpnp_ndarray
@@ -159,11 +159,7 @@ def support_input_format(func):
             result = invoke_func(self, *hostargs, **hostkwargs)
 
             if queue and hasattr(data, "__sycl_usm_array_interface__"):
-                return (
-                    copy_to_dpnp(queue, result)
-                    if is_dpnp_ndarray(data)
-                    else copy_to_usm(queue, result)
-                )
+                return copy_to_dpnp(queue, result)
 
         if get_config().get("transform_output") in ("default", None):
             input_array_api = getattr(data, "__array_namespace__", lambda: None)()

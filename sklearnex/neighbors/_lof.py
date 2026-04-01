@@ -164,7 +164,7 @@ class LocalOutlierFactor(KNeighborsDispatchingBase, _sklearn_LocalOutlierFactor)
         return is_inlier
 
     # This had to be done because predict loses the queue when no
-    # argument is given and it is a dpctl tensor or dpnp array.
+    # argument is given and it is a dpnp array.
     # This would cause issues in fit_predict. Also, available_if
     # is hard to unwrap, and this is the most straightforward way.
     @available_if(_sklearn_LocalOutlierFactor._check_novelty_fit_predict)

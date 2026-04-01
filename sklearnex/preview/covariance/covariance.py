@@ -147,7 +147,7 @@ class EmpiricalCovariance(oneDALEstimator, _sklearn_EmpiricalCovariance):
     def score(self, X_test, y=None):
 
         check_is_fitted(self)
-        # Only covariance evaluated for get_namespace due to dpnp/dpctl
+        # Only covariance evaluated for get_namespace due to dpnp
         # support without array_api_dispatch
         xp, _ = get_namespace(X_test, self.covariance_)
 
@@ -179,9 +179,9 @@ class EmpiricalCovariance(oneDALEstimator, _sklearn_EmpiricalCovariance):
         # in the case of numpy-like inputs it will use sklearn's version instead.
         # This can be deprecated if/when sklearn makes the equivalent array API enabled.
         # This includes a validate_data call and an unusual call to get_namespace in
-        # order to also support dpnp/dpctl without array_api_dispatch.
+        # order to also support dpnp without array_api_dispatch.
         check_is_fitted(self)
-        # Only covariance evaluated for get_namespace due to dpnp/dpctl
+        # Only covariance evaluated for get_namespace due to dpnp
         # support without array_api_dispatch
         xp, _ = get_namespace(comp_cov, self.covariance_)
         c_cov = validate_data(
@@ -230,7 +230,7 @@ class EmpiricalCovariance(oneDALEstimator, _sklearn_EmpiricalCovariance):
         X_in = validate_data(self, X, reset=False)
 
         if not _is_numpy_namespace(xp) and isinstance(X_in, np.ndarray):
-            # corrects issues with respect to dpnp/dpctl support without array_api_dispatch
+            # corrects issues with respect to dpnp support without array_api_dispatch
             X_in = X
             loc = xp.asarray(loc, device=X.device)
             precision = xp.asarray(precision, device=X.device)

@@ -230,7 +230,7 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
         # Validate classification targets.
         # Only validate numpy arrays since _check_classification_targets
         # uses np.asarray internally, which fails for device arrays
-        # (dpnp, dpctl, torch XPU, etc.).
+        # (dpnp, torch XPU, etc.).
         if not skip_validation and _is_numpy_namespace(xp):
             _check_classification_targets(y)
 

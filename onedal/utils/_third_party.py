@@ -55,11 +55,9 @@ def is_dpctl_available(version=None):
     return dpctl_available
 
 
-# Note: The dpctl package contains both SYCL infrastructure as well as a
-# data framework (dpctl.tensor). dpctl.tensor is not imported when dpctl is
-# imported. All data frameworks are to be lazy-loaded, but aspects of dpctl
-# (e.g. SyclQueue) are loaded as normal as it is preferred over included
-# backend replacements in the core onedal python module.
+# Note: The dpctl package provides SYCL infrastructure (e.g. SyclQueue)
+# which is loaded as normal as it is preferred over included backend
+# replacements in the core onedal python module.
 dpctl_available = is_dpctl_available()
 
 if dpctl_available:
@@ -180,25 +178,6 @@ def is_dpnp_ndarray(x: object) -> bool:
         Flag if subclass of dpnp.ndarray.
     """
     return _is_subclass_fast(type(x), "dpnp", "ndarray")
-
-
-def is_dpctl_tensor(x: object) -> bool:
-    """Return True if 'x' is a dpctl usm_ndarray.
-
-    This function does not import dpctl.tensor if it has not already been
-    imported and is therefore cheap to use.
-
-    Parameters
-    ----------
-    x : object
-        Any python object.
-
-    Returns
-    -------
-    is_dpctl : bool
-        Flag if subclass of dpctl.tensor.usm_ndarray.
-    """
-    return _is_subclass_fast(type(x), "dpctl.tensor", "usm_ndarray")
 
 
 def is_torch_tensor(x: object) -> bool:

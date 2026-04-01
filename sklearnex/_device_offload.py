@@ -19,7 +19,7 @@ from functools import wraps
 from typing import Any, Union
 
 from onedal._device_offload import _transfer_to_host
-from onedal.datatypes import copy_to_dpnp, copy_to_usm
+from onedal.datatypes import copy_to_dpnp
 from onedal.utils import _sycl_queue_manager as QM
 from onedal.utils._array_api import _asarray, _is_numpy_namespace
 from onedal.utils._third_party import is_dpnp_ndarray
@@ -226,11 +226,7 @@ def wrap_output_data(func: Callable) -> Callable:
                 ):
                     return result
                 queue = usm_iface["syclobj"]
-                return (
-                    copy_to_dpnp(queue, result)
-                    if is_dpnp_ndarray(data)
-                    else copy_to_usm(queue, result)
-                )
+                return copy_to_dpnp(queue, result)
 
             if get_config().get("transform_output") in ("default", None):
                 if hasattr(data, "dtype"):

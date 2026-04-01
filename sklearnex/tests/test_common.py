@@ -218,10 +218,9 @@ def test_frameworks_lazy_import(monkeypatch):
     """Check that all estimators defined in sklearnex do not actively
     load data frameworks which are not numpy or pandas.
     """
-    active = ["numpy", "pandas", "dpctl.tensor"]
+    active = ["numpy", "pandas", "dpnp"]
     # handle naming conventions for data frameworks in testing
-    frameworks = test_frameworks.replace("dpctl", "dpctl.tensor")
-    frameworks = frameworks.replace("array_api", "array_api_strict")
+    frameworks = test_frameworks.replace("array_api", "array_api_strict")
     lazy = ",".join([i for i in frameworks.split(",") if i not in active])
     if not lazy:
         pytest.skip("No lazily-imported data frameworks available in testing")

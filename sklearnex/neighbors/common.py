@@ -109,7 +109,7 @@ class KNeighborsDispatchingBase(oneDALEstimator):
             y_pred = xp.mean(gathered, axis=1)
         else:
             # Create y_pred array - matches original onedal implementation using empty()
-            # For Array API arrays (dpctl/dpnp), pass device parameter to match input device
+            # For Array API arrays (e.g., dpnp), pass device parameter to match input device
             # For numpy arrays, device parameter is not supported and not needed
             y_pred_shape = (neigh_ind.shape[0], _y.shape[1])
             if not _is_numpy_namespace(xp):
