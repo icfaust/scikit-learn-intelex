@@ -24,7 +24,6 @@ from onedal._device_offload import _transfer_to_host
 from onedal.neighbors import NearestNeighbors as onedal_NearestNeighbors
 from onedal.utils._array_api import _is_numpy_namespace
 
-from .._config import get_config
 from .._device_offload import dispatch, wrap_output_data
 from ..utils._array_api import enable_array_api, get_namespace
 from ..utils.validation import validate_data
@@ -155,13 +154,12 @@ class NearestNeighbors(KNeighborsDispatchingBase, _sklearn_NearestNeighbors):
         xp, _ = get_namespace(X)
         self._set_effective_metric()
 
-        if not get_config()["use_raw_input"]:
-            X = validate_data(
-                self,
-                X,
-                dtype=[xp.float64, xp.float32],
-                accept_sparse="csr",
-            )
+        X = validate_data(
+            self,
+            X,
+            dtype=[xp.float64, xp.float32],
+            accept_sparse="csr",
+        )
 
         onedal_params = {
             "n_neighbors": self.n_neighbors,

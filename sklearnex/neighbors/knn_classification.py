@@ -28,7 +28,6 @@ from onedal.neighbors import KNeighborsClassifier as onedal_KNeighborsClassifier
 from onedal.utils._array_api import _is_numpy_namespace
 from onedal.utils.validation import _check_classification_targets
 
-from .._config import get_config
 from .._device_offload import dispatch, wrap_output_data
 from ..utils._array_api import enable_array_api, get_namespace
 from ..utils.validation import validate_data
@@ -160,20 +159,17 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
         xp, _ = get_namespace(X)
         self._set_effective_metric()
 
-        if not get_config()["use_raw_input"]:
-            X, y = validate_data(
-                self,
-                X,
-                y,
-                dtype=[xp.float64, xp.float32],
-                accept_sparse="csr",
-                multi_output=True,
-            )
+        X, y = validate_data(
+            self,
+            X,
+            y,
+            dtype=[xp.float64, xp.float32],
+            accept_sparse="csr",
+            multi_output=True,
+        )
 
         # Process classification targets before passing to onedal
-        self._process_classification_targets(
-            y, skip_validation=get_config()["use_raw_input"]
-        )
+        self._process_classification_targets(y, skip_validation=False)
 
         # Call onedal backend
         onedal_params = {
@@ -213,7 +209,6 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
             Target values
         skip_validation : bool, default=False
             If True, skip check_classification_targets validation.
-            Used when use_raw_input=True (SPMD mode).
         """
         # Array API support: get namespace from y
         xp, _ = get_namespace(y)
@@ -252,7 +247,7 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
             self._y = xp.reshape(self._y, (-1,))
 
     def _onedal_predict(self, X, queue=None):
-        if X is not None and not get_config()["use_raw_input"]:
+        if X is not None:
             xp, _ = get_namespace(X)
             X = validate_data(
                 self,
@@ -274,7 +269,7 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
         )
 
     def _onedal_predict_proba(self, X, queue=None):
-        if X is not None and not get_config()["use_raw_input"]:
+        if X is not None:
             xp, _ = get_namespace(X)
             X = validate_data(
                 self,
@@ -293,21 +288,17 @@ class KNeighborsClassifier(KNeighborsDispatchingBase, _sklearn_KNeighborsClassif
     def _onedal_kneighbors(
         self, X=None, n_neighbors=None, return_distance=True, queue=None
     ):
-        # Only skip validation when use_raw_input=True (SPMD mode)
-        use_raw_input = get_config()["use_raw_input"]
-
         # Determine if query is the training data
         if X is not None:
             query_is_train = False
-            if not use_raw_input:
-                xp, _ = get_namespace(X)
-                X = validate_data(
-                    self,
-                    X,
-                    dtype=[xp.float64, xp.float32],
-                    accept_sparse="csr",
-                    reset=False,
-                )
+            xp, _ = get_namespace(X)
+            X = validate_data(
+                self,
+                X,
+                dtype=[xp.float64, xp.float32],
+                accept_sparse="csr",
+                reset=False,
+            )
         else:
             query_is_train = True
             X = self._fit_X

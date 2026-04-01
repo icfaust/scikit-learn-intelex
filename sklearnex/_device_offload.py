@@ -80,7 +80,7 @@ def dispatch(
 
     Depending on support conditions, oneDAL will be called, otherwise it will
     fall back to calling scikit-learn.  Dispatching to oneDAL can be influenced
-    by the 'use_raw_input' or 'allow_fallback_to_host' config parameters.
+    by the 'allow_fallback_to_host' config parameter.
 
     Parameters
     ----------
@@ -111,10 +111,6 @@ def dispatch(
         Returned object dependent on the supplied branches. Implicitly the returned
         object types should match for the sklearn and onedal object methods.
     """
-
-    if get_config()["use_raw_input"]:
-        with QM.manage_global_queue(None, *args) as queue:
-            return branches["onedal"](obj, *args, **kwargs, queue=queue)
 
     # Determine if array_api dispatching is enabled, and if estimator is capable
     onedal_array_api = _array_api_offload() and get_tags(obj).onedal_array_api
@@ -215,16 +211,8 @@ def wrap_output_data(func: Callable) -> Callable:
             ):
                 _, (result,) = _transfer_to_host(result)
                 return result
-            # Remove check for result __sycl_usm_array_interface__ on deprecation of use_raw_inputs
-            if (
-                usm_iface := getattr(data, "__sycl_usm_array_interface__", None)
-            ) and not hasattr(result, "__sycl_usm_array_interface__"):
-                # Skip if result elements are already SYCL arrays
-                # (e.g. kneighbors tuple from from_table(like=X))
-                if isinstance(result, (tuple, list)) and all(
-                    hasattr(r, "__sycl_usm_array_interface__") for r in result
-                ):
-                    return result
+
+            if usm_iface := getattr(data, "__sycl_usm_array_interface__", None):
                 queue = usm_iface["syclobj"]
                 return copy_to_dpnp(queue, result)
 

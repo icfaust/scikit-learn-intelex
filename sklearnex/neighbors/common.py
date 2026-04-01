@@ -34,7 +34,6 @@ from onedal._device_offload import _transfer_to_host
 from onedal.utils._array_api import _is_numpy_namespace
 from onedal.utils.validation import _check_array, _num_features, _num_samples
 
-from .._config import get_config
 from .._utils import PatchingConditionsChain
 from ..base import oneDALEstimator
 from ..utils._array_api import get_namespace
@@ -242,8 +241,8 @@ class KNeighborsDispatchingBase(oneDALEstimator):
         """Set effective_metric_ and effective_metric_params_ without validation.
 
         Used when we need to set metrics but can't call _fit_validation
-        (e.g., in SPMD mode with use_raw_input=True where sklearn validation
-        would try to convert array API to numpy).
+        (e.g., in SPMD mode where sklearn validation would try to convert
+        array API to numpy).
         """
         if self.metric_params is not None and "p" in self.metric_params:
             if self.p is not None:

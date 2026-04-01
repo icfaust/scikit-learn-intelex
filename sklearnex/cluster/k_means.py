@@ -193,29 +193,28 @@ if daal_check_version((2023, "P", 200)):
 
             xp, _ = get_namespace(X)
 
-            if not get_config()["use_raw_input"]:
-                if _is_arraylike_not_scalar(self.init):
-                    init = validate_data(
-                        self,
-                        self.init,
-                        dtype=[xp.float64, xp.float32],
-                        accept_sparse="csr",
-                        copy=True,
-                        order="C",
-                        reset=False,
-                    )
-                    self._validate_center_shape(X, init)
-                    self.init = init
-
-                X = validate_data(
+            if _is_arraylike_not_scalar(self.init):
+                init = validate_data(
                     self,
-                    X,
-                    accept_sparse="csr",
+                    self.init,
                     dtype=[xp.float64, xp.float32],
+                    accept_sparse="csr",
+                    copy=True,
                     order="C",
-                    copy=self.copy_x,
-                    accept_large_sparse=False,
+                    reset=False,
                 )
+                self._validate_center_shape(X, init)
+                self.init = init
+
+            X = validate_data(
+                self,
+                X,
+                accept_sparse="csr",
+                dtype=[xp.float64, xp.float32],
+                order="C",
+                copy=self.copy_x,
+                accept_large_sparse=False,
+            )
 
             # Validate critical parameters to match sklearn's _check_params
             # behavior, which we bypass in the oneDAL path. This is needed
@@ -386,16 +385,13 @@ if daal_check_version((2023, "P", 200)):
         def _onedal_predict(self, X, sample_weight=None, queue=None):
 
             xp, _ = get_namespace(X)
-
-            if not get_config()["use_raw_input"]:
-                X = validate_data(
-                    self,
-                    X,
-                    accept_sparse="csr",
-                    reset=False,
-                    dtype=[xp.float64, xp.float32],
-                )
-
+            X = validate_data(
+                self,
+                X,
+                accept_sparse="csr",
+                reset=False,
+                dtype=[xp.float64, xp.float32],
+            )
             return self._onedal_estimator.predict(X, queue=queue)
 
         def _onedal_supported(self, method_name, *data):
@@ -456,17 +452,15 @@ if daal_check_version((2023, "P", 200)):
         def _onedal_transform(self, X, queue=None):
 
             xp, is_array_api = get_namespace(X)
-
-            if not get_config()["use_raw_input"]:
-                X = validate_data(
-                    self,
-                    X,
-                    accept_sparse="csr",
-                    reset=False,
-                    dtype=[xp.float64, xp.float32],
-                    order="C",
-                    accept_large_sparse=False,
-                )
+            X = validate_data(
+                self,
+                X,
+                accept_sparse="csr",
+                reset=False,
+                dtype=[xp.float64, xp.float32],
+                order="C",
+                accept_large_sparse=False,
+            )
 
             if is_array_api:
                 centers = xp.asarray(self.cluster_centers_)
@@ -500,15 +494,13 @@ if daal_check_version((2023, "P", 200)):
         def _onedal_score(self, X, y=None, sample_weight=None, queue=None):
 
             xp, _ = get_namespace(X)
-
-            if not get_config()["use_raw_input"]:
-                X = validate_data(
-                    self,
-                    X,
-                    accept_sparse="csr",
-                    reset=False,
-                    dtype=[xp.float64, xp.float32],
-                )
+            X = validate_data(
+                self,
+                X,
+                accept_sparse="csr",
+                reset=False,
+                dtype=[xp.float64, xp.float32],
+            )
 
             if not sklearn_check_version("1.5") and sklearn_check_version("1.3"):
                 if isinstance(sample_weight, str) and sample_weight == "deprecated":

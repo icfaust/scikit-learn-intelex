@@ -400,16 +400,14 @@ if daal_check_version((2024, "P", 1)):
             xp, _ = get_namespace(X)
             xp_y, is_array_api_compliant_y = get_namespace(y)
 
-            use_raw_input = get_config().get("use_raw_input", False) is True
-            if not use_raw_input:
-                X, y = validate_data(
-                    self,
-                    X,
-                    y,
-                    accept_sparse=_sparsity_enabled,
-                    accept_large_sparse=_sparsity_enabled,
-                    dtype=[xp.float64, xp.float32],
-                )
+            X, y = validate_data(
+                self,
+                X,
+                y,
+                accept_sparse=_sparsity_enabled,
+                accept_large_sparse=_sparsity_enabled,
+                dtype=[xp.float64, xp.float32],
+            )
 
             self.classes_ = (
                 xp_y.unique_values(y)
@@ -453,16 +451,14 @@ if daal_check_version((2024, "P", 1)):
 
             xp, _ = get_namespace(X)
             xp_y, _ = get_namespace(self.classes_)
-            use_raw_input = get_config().get("use_raw_input", False) is True
-            if not use_raw_input:
-                X = validate_data(
-                    self,
-                    X,
-                    reset=False,
-                    accept_sparse=_sparsity_enabled,
-                    accept_large_sparse=_sparsity_enabled,
-                    dtype=[xp.float64, xp.float32],
-                )
+            X = validate_data(
+                self,
+                X,
+                reset=False,
+                accept_sparse=_sparsity_enabled,
+                accept_large_sparse=_sparsity_enabled,
+                dtype=[xp.float64, xp.float32],
+            )
 
             assert hasattr(self, "_onedal_estimator")
 
@@ -486,16 +482,14 @@ if daal_check_version((2024, "P", 1)):
                 return daal4py_predict(self, X, "computeClassProbabilities")
 
             xp, _ = get_namespace(X)
-            use_raw_input = get_config().get("use_raw_input", False) is True
-            if not use_raw_input:
-                X = validate_data(
-                    self,
-                    X,
-                    reset=False,
-                    accept_sparse=_sparsity_enabled,
-                    accept_large_sparse=_sparsity_enabled,
-                    dtype=[xp.float64, xp.float32],
-                )
+            X = validate_data(
+                self,
+                X,
+                reset=False,
+                accept_sparse=_sparsity_enabled,
+                accept_large_sparse=_sparsity_enabled,
+                dtype=[xp.float64, xp.float32],
+            )
 
             assert hasattr(self, "_onedal_estimator")
             res = self._onedal_estimator.predict_proba(X, queue=queue)
@@ -537,16 +531,14 @@ if daal_check_version((2024, "P", 1)):
                 return super().decision_function(X)
 
             xp, _ = get_namespace(X)
-            use_raw_input = get_config().get("use_raw_input", False) is True
-            if not use_raw_input:
-                X = validate_data(
-                    self,
-                    X,
-                    reset=False,
-                    accept_sparse=_sparsity_enabled,
-                    accept_large_sparse=_sparsity_enabled,
-                    dtype=[xp.float64, xp.float32],
-                )
+            X = validate_data(
+                self,
+                X,
+                reset=False,
+                accept_sparse=_sparsity_enabled,
+                accept_large_sparse=_sparsity_enabled,
+                dtype=[xp.float64, xp.float32],
+            )
 
             assert hasattr(self, "_onedal_estimator")
 

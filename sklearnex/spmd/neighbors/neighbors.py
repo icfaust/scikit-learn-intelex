@@ -57,7 +57,6 @@ class KNeighborsRegressor(base_KNeighborsRegressor):
 
     def _onedal_fit(self, X, y, queue=None):
         # SPMD is always GPU; extract queue from data when not provided
-        # (use_raw_input=True bypasses queue detection in dispatch)
         if queue is None:
             xp, is_array_api = get_namespace(X)
             if is_array_api and not _is_numpy_namespace(xp):

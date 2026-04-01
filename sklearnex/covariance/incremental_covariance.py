@@ -33,7 +33,7 @@ from onedal.covariance import (
 )
 from onedal.utils._array_api import _is_numpy_namespace
 
-from .._config import config_context, get_config
+from .._config import config_context
 from .._device_offload import dispatch, wrap_output_data
 from .._utils import PatchingConditionsChain, _add_inc_serialization_note
 from ..base import oneDALEstimator
@@ -191,7 +191,7 @@ class IncrementalEmpiricalCovariance(oneDALEstimator, BaseEstimator):
     def _onedal_partial_fit(self, X, queue=None, check_input=True):
         first_pass = not hasattr(self, "n_samples_seen_") or self.n_samples_seen_ == 0
 
-        if check_input and not get_config()["use_raw_input"]:
+        if check_input:
             xp, _ = get_namespace(X)
             X = validate_data(
                 self,
@@ -297,9 +297,8 @@ class IncrementalEmpiricalCovariance(oneDALEstimator, BaseEstimator):
         if hasattr(self, "_onedal_estimator"):
             self._onedal_estimator._reset()
 
-        if not get_config()["use_raw_input"]:
-            xp, _ = get_namespace(X)
-            X = validate_data(self, X, dtype=[xp.float64, xp.float32], copy=self.copy)
+        xp, _ = get_namespace(X)
+        X = validate_data(self, X, dtype=[xp.float64, xp.float32], copy=self.copy)
 
         self.batch_size_ = self.batch_size if self.batch_size else 5 * self.n_features_in_
 

@@ -15,20 +15,16 @@
 # ==============================================================================
 
 import inspect
-import logging
 from functools import wraps
 from operator import xor
 
 import numpy as np
 from sklearn import get_config
 
-from ._config import _get_config
 from .datatypes import copy_to_dpnp, dlpack_to_numpy
 from .utils import _sycl_queue_manager as QM
 from .utils._array_api import _asarray, _get_sycl_namespace, _is_numpy_namespace
 from .utils._third_party import is_dpnp_ndarray
-
-logger = logging.getLogger("sklearnex")
 
 
 def supports_queue(func):
@@ -126,26 +122,7 @@ def support_input_format(func):
         else:
             self = None
 
-        # KNeighbors*.fit can not be used with raw inputs, ignore `use_raw_input=True`
-        override_raw_input = (
-            self
-            and self.__class__.__name__ in ("KNeighborsClassifier", "KNeighborsRegressor")
-            and func.__name__ == "fit"
-            and _get_config()["use_raw_input"] is True
-        )
-        if override_raw_input:
-            pretty_name = f"{self.__class__.__name__}.{func.__name__}"
-            logger.warning(
-                f"Using raw inputs is not supported for {pretty_name}. Ignoring `use_raw_input=True` setting."
-            )
-        if _get_config()["use_raw_input"] is True and not override_raw_input:
-            if "queue" not in kwargs:
-                if usm_iface := getattr(args[0], "__sycl_usm_array_interface__", None):
-                    kwargs["queue"] = usm_iface["syclobj"]
-                else:
-                    kwargs["queue"] = None
-            return invoke_func(self, *args, **kwargs)
-        elif len(args) == 0 and len(kwargs) == 0:
+        if len(args) == 0 and len(kwargs) == 0:
             # no arguments, there's nothing we can deduce from them -> just call the function
             return invoke_func(self, *args, **kwargs)
 

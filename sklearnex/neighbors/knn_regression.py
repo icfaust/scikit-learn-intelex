@@ -26,7 +26,6 @@ from daal4py.sklearn.utils.validation import get_requires_y_tag
 from onedal.neighbors import KNeighborsRegressor as onedal_KNeighborsRegressor
 from onedal.utils._array_api import _is_numpy_namespace
 
-from .._config import get_config
 from .._device_offload import dispatch, wrap_output_data
 from ..utils._array_api import enable_array_api, get_namespace
 from ..utils.validation import validate_data
@@ -142,16 +141,15 @@ class KNeighborsRegressor(KNeighborsDispatchingBase, _sklearn_KNeighborsRegresso
         xp, _ = get_namespace(X, y)
         self._set_effective_metric()
 
-        if not get_config()["use_raw_input"]:
-            X, y = validate_data(
-                self,
-                X,
-                y,
-                dtype=[xp.float64, xp.float32],
-                accept_sparse="csr",
-                multi_output=True,
-                y_numeric=True,
-            )
+        X, y = validate_data(
+            self,
+            X,
+            y,
+            dtype=[xp.float64, xp.float32],
+            accept_sparse="csr",
+            multi_output=True,
+            y_numeric=True,
+        )
 
         self._process_regression_targets(y)
         onedal_params = {
@@ -243,7 +241,7 @@ class KNeighborsRegressor(KNeighborsDispatchingBase, _sklearn_KNeighborsRegresso
 
     def _predict_skl(self, X, queue=None):
         """SKL prediction path - calls kneighbors through sklearnex, computes prediction here."""
-        if X is not None and not get_config()["use_raw_input"]:
+        if X is not None:
             xp, _ = get_namespace(X)
             X = validate_data(
                 self, X, dtype=[xp.float64, xp.float32], accept_sparse="csr", reset=False
@@ -256,15 +254,14 @@ class KNeighborsRegressor(KNeighborsDispatchingBase, _sklearn_KNeighborsRegresso
         # Determine if query is the training data
         if X is not None:
             query_is_train = False
-            if not get_config()["use_raw_input"]:
-                xp, _ = get_namespace(X)
-                X = validate_data(
-                    self,
-                    X,
-                    dtype=[xp.float64, xp.float32],
-                    accept_sparse="csr",
-                    reset=False,
-                )
+            xp, _ = get_namespace(X)
+            X = validate_data(
+                self,
+                X,
+                dtype=[xp.float64, xp.float32],
+                accept_sparse="csr",
+                reset=False,
+            )
         else:
             query_is_train = True
             X = self._fit_X
