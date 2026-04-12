@@ -73,6 +73,7 @@ header:
     - 'AGENTS.md'
     # External copies of copyrighted work
     - 'onedal/datatypes/dlpack/dlpack.h'
+    - 'onedal/datatypes/arrow/api.h'
   comment: never
 
   license-location-threshold: 80 # specifies the index threshold where the license header can be located.

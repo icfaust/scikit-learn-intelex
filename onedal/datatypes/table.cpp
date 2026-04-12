@@ -23,6 +23,8 @@
 
 #include "onedal/datatypes/numpy/data_conversion.hpp"
 #include "onedal/datatypes/dlpack/data_conversion.hpp"
+#include "onedal/datatypes/arrow/data_conversion.hpp"
+
 #include "onedal/datatypes/numpy/numpy_utils.hpp"
 #include "onedal/common/pybind11_helpers.hpp"
 #include "onedal/version.hpp"
@@ -31,6 +33,11 @@
 #include "oneapi/dal/table/detail/csr.hpp"
 #else
 #include "oneapi/dal/table/csr.hpp"
+#endif
+
+#if ONEDAL_VERSION >= 20240000
+#define ONEDAL_HETEROGEN_TABLE
+#include "onedal/dal/table/heterogen.hpp"
 #endif
 
 namespace py = pybind11;
@@ -66,6 +73,11 @@ ONEDAL_PY_INIT_MODULE(table) {
         if (t.get_kind() == csr_table_t::kind()) {
             return "csr";
         }
+        #ifdef ONEDAL_HETEROGEN_TABLE
+        if (t.get_kind() == heterogen_table::kind()) {
+            return "heterogen";
+        }
+        #endif
         return "unknown";
     });
     table_obj.def_property_readonly("shape", [](const table& t) {
@@ -127,6 +139,9 @@ ONEDAL_PY_INIT_MODULE(table) {
 #endif // ONEDAL_DATA_PARALLEL
         if (py::hasattr(obj, "__dlpack__")) {
             return dlpack::convert_to_table(obj, queue);
+        }
+        if (py::hasattr(obj, "__arrow_c_stream__") || py::hasattr(obj, "__arrow_c_array__")) {
+            return arrow::convert_to_table(obj, queue);
         }
         // assume to be sparse (handled in numpy)
         return numpy::convert_to_table(obj, queue);
