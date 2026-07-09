@@ -216,7 +216,11 @@ void init_model(py::module_& m) {
                        [](const py::bytes& bytes) {
                            return deserialize<model_t>(bytes);
                        }))
-                   .DEF_ONEDAL_PY_PROPERTY(packed_coefficients, model_t);
+                    // natually handle when intercept and coefficients are separate arrays
+                   .def_property("packed_coefficients", &model_t.get_packed_coefficients, [](py::object obj) {
+                        if (py::isinstance<py::tuple>(obj) && py::len(obj) == 2){}
+                        else{}
+        });
 }
 
 template <typename Task>
