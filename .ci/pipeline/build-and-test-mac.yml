@@ -13,7 +13,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #===============================================================================
+#
+# macOS build-and-test steps template for Extension for Scikit-learn (sklearnex).
+#
+# STATUS: not currently referenced by any active pipeline. Kept as scaffolding
+# for reviving a macOS matrix — sklearnex/oneDAL do not ship official macOS
+# builds today, and the sibling oneDAL cross-repo job (see ../oneDAL/.ci) only
+# consumes the -lnx and -win templates.
+#
+# When wiring this back into ci.yml/nightly.yml, note the important
+# differences from the Linux template:
+#   * No DALROOT/TBBROOT gating — this template always installs dal-devel from
+#     conda-forge into env `CB` and points DALROOT at $CONDA_PREFIX. It has no
+#     cross-repo/artifact-consumer mode.
+#   * No DPC++ path — DPC++/GPU is Linux/Windows-only.
+#   * No coverage collection — matches the historical macOS matrix (add
+#     COVERAGE_RCFILE handling if you want codecov uploads).
+#   * No NO_DIST guard on the sklearnex test run.
+#
+# Required pipeline variables when re-enabled:
+#   PYTHON_VERSION   - Python interpreter version (e.g. '3.12')
+#   SKLEARN_VERSION  - Stock scikit-learn version to test against
+#
+# Assumes an Azure macOS hosted image with miniconda pre-installed at $CONDA.
+#===============================================================================
 steps:
+  # Prepend the pre-installed conda to PATH, take ownership of $CONDA so
+  # subsequent `conda` writes succeed on macOS agents (fresh images have it
+  # owned by root), and create env `CB` with everything needed to build and
+  # test in one shot — including dal-devel, which the Linux template installs
+  # in a separate step so it can gate on DALROOT.
   - script: |
       echo "##vso[task.prependpath]$CONDA/bin"
       sudo chown -R $USER $CONDA
@@ -21,37 +50,47 @@ steps:
       conda update -q conda
       conda create -n CB -c conda-forge python=$(PYTHON_VERSION) dal-devel mpich clang-format pip setuptools wheel
     displayName: Create Anaconda environment
+  # Emit compiler/lib/CPU info to the log. cpufeature is pip-installed here
+  # because it isn't packaged on conda-forge for macOS.
   - script: |
       source activate CB
       pip install -q cpufeature
       bash .ci/scripts/describe_system.sh
     displayName: "System info"
+  # Python build deps beyond what conda supplies (Cython, jinja2, pybind11, …).
   - script: |
       source activate CB
       pip install -r dependencies-dev
       conda list
     displayName: 'Install develop requirements'
+  # Build the extension against the conda-supplied oneDAL. No NO_DPC/NO_DIST
+  # branching — macOS is CPU + non-MPI only in this template.
   - script: |
       source activate CB
       export DALROOT=$CONDA_PREFIX
       ./conda-recipe/build.sh
     displayName: Conda build
+  # Pin scikit-learn per the matrix and install pytest deps.
   - script: |
       source activate CB
       bash .ci/scripts/setup_sklearn.sh $(SKLEARN_VERSION)
       pip install --upgrade -r requirements-test.txt
       conda list
     displayName: 'Install testing requirements'
+  # Sklearnex's own test suite. `cd ..` matches Azure's `s/` checkout layout.
   - script: |
       source activate CB
       cd ..
       ./s/conda-recipe/run_test.sh
     displayName: 'Sklearnex testing'
+  # Upstream sklearn suite against patched estimators. succeededOrFailed keeps
+  # this running even when the sklearnex suite above fails.
   - script: |
       source activate CB
       bash .ci/scripts/run_sklearn_tests.sh
     displayName: 'Sklearn testing'
     condition: succeededOrFailed()
+  # Re-run the sklearn suite with preview estimators enabled.
   - script: |
       source activate CB
       bash .ci/scripts/run_sklearn_tests.sh

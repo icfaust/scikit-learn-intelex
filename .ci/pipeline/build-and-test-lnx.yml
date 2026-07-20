@@ -13,9 +13,54 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #===============================================================================
+#
+# Linux build-and-test steps template for Extension for Scikit-learn (sklearnex).
+#
+# This template is consumed as a `- template:` include by:
+#   * .ci/pipeline/ci.yml            (LinuxCondaEnv job — per-PR matrix)
+#   * .ci/pipeline/nightly.yml       (LinuxNightly job — sklearn main nightly)
+#   * ../oneDAL/.ci/pipeline/ci.yml  (LinuxSklearnex job — cross-repo validation
+#                                     that consumes a freshly built oneDAL
+#                                     artifact via the `@sklearnex` repository
+#                                     resource pinned in oneDAL's ci.yml)
+#
+# Required pipeline variables (set by the calling job):
+#   PYTHON_VERSION   - Python interpreter version (e.g. '3.12')
+#   SKLEARN_VERSION  - Stock scikit-learn version to test against
+#                      ('main' pulls the nightly wheel; see setup_sklearn.sh)
+#
+# Optional pipeline variables that steer behavior:
+#   DALROOT          - When set, oneDAL is taken from this path (used by the
+#                      oneDAL cross-repo job that publishes a build artifact).
+#                      When unset, oneDAL is installed from conda-forge.
+#   TBBROOT          - When set and different from $CONDA_PREFIX, its env/vars.sh
+#                      is sourced before build/test (oneDAL-artifact path).
+#   DPCPPROOT        - Optional DPC++ compiler root; consumed by conda-recipe/build.sh.
+#   NO_DPC           - When set (any value), skip DPC++/GPU code paths — the
+#                      dpcpp compiler and mkl-dpcpp/dpctl/dpnp installs are
+#                      skipped and sklearn tests run on CPU only.
+#   NO_DIST          - When set, disables MPI/distributed code paths in the build
+#                      and test steps.
+#   COVERAGE_RCFILE  - When set, .coverage.* files are written for each test
+#                      stage so codecov-lnx.yml can combine and upload them.
+#
+# Assumptions about the runner:
+#   * Ubuntu image with miniconda pre-installed at /usr/share/miniconda (the
+#     Azure `ubuntu-24.04` hosted image satisfies this).
+#   * `sudo apt-get` works without prompting.
+#   * The working directory contains the sklearnex source tree (either from the
+#     job's implicit checkout or, in the oneDAL job, from an explicit `git clone`
+#     that runs before this template).
+#===============================================================================
 steps:
+  # Refresh the apt index so any downstream package installs (e.g. sourced from
+  # describe_system.sh or codecov steps) resolve against current metadata.
   - script: sudo apt-get update
     displayName: "apt-get"
+  # Provision a fresh conda env `CB` locked to conda-forge. Strict channel
+  # priority prevents the `defaults` channel from silently supplying older
+  # or ABI-mismatched builds of dal/mkl. mpich is baked in so the distributed
+  # (MPI) path builds even when NO_DIST is not set by the caller.
   - script: |
       # set defaults to guarantee use of conda-forge
       echo -e "default_channels:\n  - https://conda.anaconda.org/conda-forge" >> ~/.condarc
@@ -24,6 +69,18 @@ steps:
       conda update -y -q conda
       conda create -q -y -n CB -c conda-forge python=$(PYTHON_VERSION) mpich pip setuptools wheel
     displayName: "Conda create"
+  # Install oneDAL + Python build dependencies.
+  #
+  # DALROOT gate: when the caller (oneDAL's LinuxSklearnex job) has already
+  # downloaded a oneDAL build artifact and pointed DALROOT at it, we must NOT
+  # overwrite that install with a conda-forge one — that's the whole point of
+  # the cross-repo run. When DALROOT is empty we're in the sklearnex-owned
+  # pipeline and pull oneDAL from conda-forge.
+  #
+  # DPC gate: DPC++ builds require the full dal-devel meta-package (dal +
+  # dal-include + dal-gpu + mkl-dpcpp) plus the dpcpp_linux-64 compiler.
+  # CPU-only builds only need `dal` and `dal-include`, which is faster and
+  # avoids pulling in GPU-only runtimes on machines without a GPU.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
@@ -43,11 +100,17 @@ steps:
       DALROOT: ${{ variables.DALROOT }}
       DPCPP_VERSION: 2026.0.0
     displayName: "Install develop requirements"
+  # Emit compiler/CPU/library versions to the log — invaluable when diagnosing
+  # matrix-only failures long after the run completes.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
       bash .ci/scripts/describe_system.sh
     displayName: "System info"
+  # Build the extension. If DALROOT wasn't supplied by the caller, fall back to
+  # the conda env prefix (where the conda-forge dal package was installed above).
+  # conda-recipe/build.sh reads NO_DPC / NO_DIST / DPCPPROOT / DALROOT to decide
+  # which code paths to compile.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
@@ -59,6 +122,11 @@ steps:
       DPCPPROOT: ${{ variables.DPCPPROOT }}
       DALROOT: ${{ variables.DALROOT }}
     displayName: "Build daal4py/sklearnex"
+  # Pin scikit-learn to the matrix version (or nightly for 'main') via
+  # setup_sklearn.sh, then layer dpctl/dpnp on top for DPC++ matrices where a
+  # compatible Python build exists. Ordering matters: conda installs precede
+  # `pip install -r requirements-test.txt` so pip pins (notably the numpy 1.x
+  # runtime pin) take final precedence over conda's resolver.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
@@ -73,6 +141,11 @@ steps:
       DPCTL_VERSION: 0.22.1
       DPNP_VERSION: 0.20.0
     displayName: "Install testing requirements"
+  # Run sklearnex's own test suite. `cd ..` and `./s/...` reflect Azure's
+  # checkout layout, where the repo is cloned into `s/` under the working
+  # directory; running from the parent keeps coverage/report paths stable.
+  # NO_DIST=1 is forced here regardless of caller — the MPI paths are exercised
+  # in dedicated distributed jobs, not the standard build-and-test matrix.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
@@ -86,6 +159,12 @@ steps:
       NO_DPC: ${{ variables.NO_DPC }}
       NO_DIST: 1
     displayName: "Sklearnex testing"
+  # Run the upstream scikit-learn test suite against the patched estimators.
+  # `$CPU` is set to "cpu" only for DPC-enabled builds so run_sklearn_tests.sh
+  # applies the CPU-lane deselections; CPU-only builds pass no device flag and
+  # get the default deselection list. `condition: succeededOrFailed()` lets
+  # this run even when the sklearnex suite above reports failures, since the
+  # two suites surface different classes of regressions.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB
@@ -99,6 +178,10 @@ steps:
       NO_DPC: ${{ variables.NO_DPC }}
     displayName: "Sklearn testing"
     condition: succeededOrFailed()
+  # Repeat the sklearn suite with SKLEARNEX_PREVIEW=YES so preview-only
+  # estimators are patched in. Coverage isn't collected here (no
+  # COVERAGE_RCFILE) to avoid double-counting sklearnex-side lines with the
+  # non-preview run above.
   - script: |
       . /usr/share/miniconda/etc/profile.d/conda.sh
       conda activate CB

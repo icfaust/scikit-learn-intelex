@@ -13,13 +13,57 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #===============================================================================
+#
+# Windows build-and-test steps template for Extension for Scikit-learn (sklearnex).
+#
+# This template is consumed as a `- template:` include by:
+#   * .ci/pipeline/ci.yml            (WindowsCondaEnv job — per-PR matrix)
+#   * .ci/pipeline/nightly.yml       (WindowsNightly job — sklearn main nightly)
+#   * ../oneDAL/.ci/pipeline/ci.yml  (WindowsSklearnex job — cross-repo validation
+#                                     that consumes a freshly built oneDAL
+#                                     artifact via the `@sklearnex` repository
+#                                     resource pinned in oneDAL's ci.yml)
+#
+# Required pipeline variables (set by the calling job):
+#   PYTHON_VERSION   - Python interpreter version (e.g. '3.12')
+#   SKLEARN_VERSION  - Stock scikit-learn version to test against
+#                      ('main' pulls the nightly wheel; see setup_sklearn.sh)
+#
+# Optional pipeline variables that steer behavior:
+#   DALROOT          - When defined, oneDAL is taken from this path (used by the
+#                      oneDAL cross-repo job that publishes a build artifact).
+#                      When undefined, oneDAL is installed from conda-forge.
+#   TBBROOT          - When defined, its env\vars.bat is called before build/test
+#                      (oneDAL-artifact path where TBB is separate from conda).
+#   COVERAGE_RCFILE  - When set, .coverage.* files are written for each test
+#                      stage so codecov-win.yml can combine and upload them.
+#
+# Assumptions about the runner:
+#   * Azure `windows-2022` hosted image with conda pre-installed under
+#     %CONDA% and MSYS2 available at C:\msys64 (used for the bash scripts).
+#   * Visual Studio 2022 Enterprise installed at the standard path — vcvarsall
+#     is invoked directly rather than via Developer Cmd Prompt.
+#   * The runner user is VssAdministrator (Azure default) — .condarc is written
+#     to that user's profile directory.
+#===============================================================================
 steps:
+  # Put the pre-installed conda on PATH via Azure's `##vso[task.prependpath]`
+  # logging command so subsequent script steps can invoke `conda`/`activate`.
   - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
     displayName: Add conda to PATH
+  # Pin conda-forge as the default channel and create env `CB`. impi-devel is
+  # the Windows counterpart of Linux's mpich — Intel MPI Library is the only
+  # MPI implementation packaged for conda on Windows.
   - script: |
       (echo default_channels: & echo   - https://conda.anaconda.org/conda-forge) >> C:\Users\VssAdministrator\.condarc
       conda create -q -y -n CB -c conda-forge python=$(PYTHON_VERSION) impi-devel pip setuptools wheel
     displayName: 'Create Anaconda environment'
+  # Install oneDAL + Python build dependencies.
+  # DALROOT gate mirrors the Linux template: only install dal-devel from
+  # conda-forge when the caller (oneDAL's WindowsSklearnex job) hasn't already
+  # supplied a DALROOT pointing at a downloaded build artifact.
+  # The >=2025.6.1 floor keeps this template compatible with older builds still
+  # being tested in matrix rows while requiring symbols added in that release.
   - script: |
       call activate CB
       pip install --upgrade setuptools
@@ -30,11 +74,19 @@ steps:
     displayName: 'Install develop requirements'
     env:
       DALROOT: ${{ variables.DALROOT }}
+  # Emit system info. MSYS's bash is prepended to PATH so the shared shell
+  # script in .ci/scripts/ runs without a Windows-specific rewrite.
   - script: |
       set PATH=C:\msys64\usr\bin;%PATH%
       call activate CB
       bash .ci/scripts/describe_system.sh
     displayName: 'System info'
+  # Build the extension. vcvarsall bootstraps the MSVC toolchain, then
+  # conda-recipe\bld.bat runs the same build logic as the conda-build recipe
+  # but against the active env (PREFIX/PYTHON tell bld.bat to install in-place
+  # rather than into a conda-build workspace — see the comment at the top of
+  # bld.bat). The explicit ERRORLEVEL check ensures build failures propagate;
+  # `call` alone doesn't set an exit code for the outer script.
   - script: |
       call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall" x64
       call activate CB
@@ -43,6 +95,9 @@ steps:
       call conda-recipe\bld.bat
       IF %ERRORLEVEL% neq 0 EXIT /b %ERRORLEVEL%
     displayName: 'Build daal4py/sklearnex'
+  # Pin scikit-learn to the matrix version and install pytest deps. No dpctl/
+  # dpnp branch here — the Windows matrix runs CPU-only (there is no
+  # NO_DPC/DPC gate on this template).
   - script: |
       set PATH=C:\msys64\usr\bin;%PATH%
       call activate CB
@@ -51,6 +106,11 @@ steps:
       cd ..
       conda list
     displayName: 'Install testing requirements'
+  # Sklearnex's own test suite. When DALROOT/TBBROOT are provided by the caller
+  # (oneDAL cross-repo job), their env\vars.bat is sourced so the loader finds
+  # the artifact's DLLs at runtime. `cd ..` matches Azure's checkout layout
+  # (repo in `s\`) and `run_test.bat s\ --json-report` runs pytest with a JSON
+  # report for downstream inspection. NO_DIST=1 forces the CPU/non-MPI path.
   - script: |
       call activate CB
       if defined DALROOT call "%DALROOT%\env\vars.bat"
@@ -64,6 +124,10 @@ steps:
       DALROOT: ${{ variables.DALROOT }}
       TBBROOT: ${{ variables.TBBROOT }}
       NO_DIST: 1
+  # Upstream scikit-learn suite against patched estimators (Windows CPU only).
+  # `condition: succeededOrFailed()` intentionally allows this to run even when
+  # sklearnex tests fail, so a failure in one suite doesn't hide regressions
+  # in the other.
   - script: |
       call activate CB
       if defined DALROOT call "%DALROOT%\env\vars.bat"
@@ -76,6 +140,9 @@ steps:
       COVERAGE_RCFILE: ${{ variables.COVERAGE_RCFILE }}
       DALROOT: ${{ variables.DALROOT }}
       TBBROOT: ${{ variables.TBBROOT }}
+  # Rerun the sklearn suite with preview estimators enabled. Coverage is
+  # intentionally not collected here so preview-lane failures don't skew the
+  # coverage report generated from the primary run above.
   - script: |
       call activate CB
       if defined DALROOT call "%DALROOT%\env\vars.bat"
