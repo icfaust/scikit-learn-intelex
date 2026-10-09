@@ -46,11 +46,7 @@ from sklearn.utils.multiclass import check_classification_targets, type_of_targe
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from daal4py.sklearn._n_jobs_support import control_n_jobs
-from daal4py.sklearn._utils import (
-    daal_check_version,
-    is_sparse,
-    sklearn_check_version,
-)
+from daal4py.sklearn._utils import is_sparse, sklearn_check_version
 from onedal.ensemble import ExtraTreesClassifier as onedal_ExtraTreesClassifier
 from onedal.ensemble import ExtraTreesRegressor as onedal_ExtraTreesRegressor
 from onedal.ensemble import RandomForestClassifier as onedal_RandomForestClassifier
@@ -78,6 +74,40 @@ __check_kwargs = {
 }
 
 _check_array = partial(check_array, **__check_kwargs)
+
+
+if sklearn_check_version("1.10"):
+    from sklearn.tree._tree import NODE_DTYPE
+
+
+def _tree_extra_args(n_features):
+    # Categorical split support added a required 'n_categories' argument to
+    # Tree.__cinit__; -1 marks a feature as non-categorical. oneDAL forests
+    # are numerical-only, so every feature is marked as such.
+    if not sklearn_check_version("1.10"):
+        return ()
+    return (np.full(n_features, -1, dtype=np.intp),)
+
+
+def _map_node_ar_to_sklearn(node_ar):
+    # The same change widened NODE_DTYPE with a 'left_cat_bitset' field, which
+    # oneDAL's node struct does not have. Copy field-wise into the wider dtype
+    # so the absent categorical bitset stays zeroed (i.e. no categories).
+    if not sklearn_check_version("1.10"):
+        return node_ar
+    nodes = np.zeros(node_ar.shape, dtype=NODE_DTYPE)
+    for name in node_ar.dtype.names:
+        nodes[name] = node_ar[name]
+    return nodes
+
+
+def _set_tree_fitted_attrs(est):
+    # '_validate_X_predict' requires this attribute, normally set by
+    # 'BaseDecisionTree._fit', which is bypassed here; None means no
+    # feature is categorical.
+    if not sklearn_check_version("1.10"):
+        return
+    est.is_categorical_ = None
 
 
 class BaseForest(oneDALEstimator, ABC):
@@ -159,13 +189,6 @@ class BaseForest(oneDALEstimator, ABC):
         else:
             self._n_samples_bootstrap = None
 
-        if (self.random_state is not None) and (not daal_check_version((2024, "P", 0))):
-            warnings.warn(
-                "Setting 'random_state' value is not supported. "
-                "State set by oneDAL to default value (777).",
-                RuntimeWarning,
-            )
-
         rs = check_random_state(self.random_state)
         # use numpy here due to lack of array API support in sklearn random state
         # seed is a python integer
@@ -229,12 +252,6 @@ class BaseForest(oneDALEstimator, ABC):
 
         patching_status.and_conditions(
             [
-                (
-                    self.oob_score
-                    and daal_check_version((2021, "P", 500))
-                    or not self.oob_score,
-                    "OOB score is only supported starting from 2021.5 version of oneDAL.",
-                ),
                 (self.warm_start is False, "Warm start is not supported."),
                 (
                     self.ccp_alpha == 0.0,
@@ -325,45 +342,33 @@ class BaseForest(oneDALEstimator, ABC):
         if method_name == "fit":
             patching_status = self._onedal_fit_ready(patching_status, *data)
 
-            patching_status.and_conditions(
-                [
-                    (
-                        daal_check_version((2023, "P", 200))
-                        or self.estimator.__class__ == DecisionTreeClassifier,
-                        "ExtraTrees only supported starting from oneDAL version 2023.2",
-                    )
-                ]
-            )
-
         elif method_name in self._n_jobs_supported_onedal_methods:
             X = data[0]
 
-            patching_status.and_conditions(
+            dal_ready = patching_status.and_conditions(
                 [
                     (hasattr(self, "_onedal_estimator"), "oneDAL model was not trained."),
                     (not is_sparse(X), "X is sparse. Sparse input is not supported."),
                     (self.warm_start is False, "Warm start is not supported."),
-                    (
-                        daal_check_version((2023, "P", 200))
-                        or self.estimator.__class__ == DecisionTreeClassifier,
-                        "ExtraTrees only supported starting from oneDAL version 2023.2",
-                    ),
                     (
                         self.n_outputs_ == 1,
                         f"Number of outputs ({self.n_outputs_}) is not 1.",
                     ),
                 ]
             )
+            if not dal_ready:
+                return patching_status
 
-            if method_name == "predict_proba":
+            try:
+                X_arr = _check_array(X)
+                assert_all_finite(X_arr)
+            except ValueError:
                 patching_status.and_conditions(
                     [
-                        (
-                            daal_check_version((2021, "P", 400)),
-                            "oneDAL version is lower than 2021.4.",
-                        )
+                        (False, "Missing values and infinites are not supported."),
                     ]
                 )
+                return patching_status
 
         else:
             raise RuntimeError(
@@ -384,11 +389,6 @@ class BaseForest(oneDALEstimator, ABC):
             patching_status.and_conditions(
                 [
                     (
-                        daal_check_version((2023, "P", 100))
-                        or self.estimator.__class__ == DecisionTreeClassifier,
-                        "ExtraTrees only supported starting from oneDAL version 2023.1",
-                    ),
-                    (
                         not self.oob_score,
                         "oob_scores using r2 or accuracy not implemented.",
                     ),
@@ -398,7 +398,7 @@ class BaseForest(oneDALEstimator, ABC):
         elif method_name in self._n_jobs_supported_onedal_methods:
             X = data[0]
 
-            patching_status.and_conditions(
+            dal_ready = patching_status.and_conditions(
                 [
                     (hasattr(self, "_onedal_estimator"), "oneDAL model was not trained"),
                     (
@@ -407,15 +407,25 @@ class BaseForest(oneDALEstimator, ABC):
                     ),
                     (self.warm_start is False, "Warm start is not supported."),
                     (
-                        daal_check_version((2023, "P", 100)),
-                        "ExtraTrees supported starting from oneDAL version 2023.1",
-                    ),
-                    (
                         self.n_outputs_ == 1,
                         f"Number of outputs ({self.n_outputs_}) is not 1.",
                     ),
                 ]
             )
+
+            if not dal_ready:
+                return patching_status
+
+            try:
+                X_arr = _check_array(X)
+                assert_all_finite(X_arr)
+            except ValueError:
+                patching_status.and_conditions(
+                    [
+                        (False, "Missing values and infinites are not supported."),
+                    ]
+                )
+                return patching_status
 
         else:
             raise RuntimeError(
@@ -511,7 +521,7 @@ class BaseForest(oneDALEstimator, ABC):
             tree_i_state_dict = {
                 "max_depth": tree_i_state_class.max_depth,
                 "node_count": tree_i_state_class.node_count,
-                "nodes": tree_i_state_class.node_ar,
+                "nodes": _map_node_ar_to_sklearn(tree_i_state_class.node_ar),
                 "values": tree_i_state_class.value_ar,
             }
             # Note: only on host.
@@ -519,8 +529,10 @@ class BaseForest(oneDALEstimator, ABC):
                 self.n_features_in_,
                 np.array([n_classes_], dtype=np.intp),
                 self.n_outputs_,
+                *_tree_extra_args(self.n_features_in_),
             )
             est_i.tree_.__setstate__(tree_i_state_dict)
+            _set_tree_fitted_attrs(est_i)
             estimators_.append(est_i)
 
         self._cached_estimators_ = estimators_
@@ -793,11 +805,13 @@ class ForestClassifier(BaseForest, _sklearn_ForestClassifier):
         else:
             xp, is_array_api_compliant = get_namespace(X, self.classes_)
 
+        # Note: the data will already have been checked for NaNs in the dispatcher
         X = validate_data(
             self,
             X,
             dtype=[xp.float64, xp.float32],
             reset=False,
+            ensure_all_finite=False,
         )
 
         res = self._onedal_estimator.predict(X, queue=queue)
@@ -820,11 +834,13 @@ class ForestClassifier(BaseForest, _sklearn_ForestClassifier):
         else:
             xp, _ = get_namespace(X)
 
+        # Note: the data will already have been checked for NaNs in the dispatcher
         X = validate_data(
             self,
             X,
             dtype=[xp.float64, xp.float32],
             reset=False,
+            ensure_all_finite=False,
         )
 
         # TODO: fix probabilities out of [0, 1] interval on oneDAL side
@@ -1011,11 +1027,13 @@ class ForestRegressor(BaseForest, _sklearn_ForestRegressor):
         check_is_fitted(self, "_onedal_estimator")
         xp, _ = get_namespace(X)
 
+        # Note: the data will already have been checked for NaNs in the dispatcher
         X = validate_data(
             self,
             X,
             dtype=[xp.float64, xp.float32],
             reset=False,
+            ensure_all_finite=False,
         )  # Warning, order of dtype matters
 
         return self._onedal_estimator.predict(X, queue=queue)

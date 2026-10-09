@@ -30,7 +30,6 @@ using daal::step2Master;
 using daal::step3Master;
 using daal::step5Master;
 using daal::services::LibraryVersionInfo;
-#include "daal_compat.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -53,12 +52,8 @@ using daal::services::LibraryVersionInfo;
 #include "data_management/data/internal/finiteness_checker.h"
 #include "data_management/data/internal/train_test_split.h"
 
-#if __INTEL_DAAL__ >= 2021 && INTEL_DAAL_VERSION >= 20210200
-    #include "data_management/data/internal/roc_auc_score.h"
-#endif
-#if __INTEL_DAAL__ >= 2021 && INTEL_DAAL_VERSION >= 20210600
-    #include "algorithms/tsne/tsne_gradient_descent.h"
-#endif
+#include "data_management/data/internal/roc_auc_score.h"
+#include "algorithms/tsne/tsne_gradient_descent.h"
 
 extern "C"
 {
@@ -242,6 +237,8 @@ extern PyObject * make_nda(daal::data_management::NumericTablePtr * nt_ptr);
 extern PyObject * make_nda(daal::data_management::DataCollectionPtr * nt_ptr);
 extern PyObject * make_nda(daal::data_management::KeyValueDataCollectionPtr * nt_ptr, const i2str_map_t &);
 extern daal::data_management::NumericTablePtr make_nt(PyObject * nda);
+extern PyObject * make_nt_capsule_for_testing(PyObject * nda, bool legacy);
+extern PyObject * roundtrip_nt_for_testing(PyObject * nda);
 extern daal::data_management::DataCollectionPtr make_datacoll(PyObject * nda);
 extern daal::data_management::KeyValueDataCollectionPtr make_dnt(PyObject * dict, str2i_map_t &);
 
